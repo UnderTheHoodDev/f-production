@@ -10,9 +10,9 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "F Production Studio | Dịch vụ chụp ảnh & studio",
+  title: "F.Production Studio | Dịch vụ chụp ảnh & studio",
   description:
-    "Giải pháp chụp ảnh chuyên nghiệp cho doanh nghiệp, cá nhân và thương hiệu tại F Production Studio.",
+    "Giải pháp chụp ảnh chuyên nghiệp cho doanh nghiệp, cá nhân và thương hiệu tại F.Production Studio.",
 };
 
 export default function RootLayout({

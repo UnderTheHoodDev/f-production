@@ -1,4 +1,7 @@
+import Image from "next/image";
+
 import { ContactForm } from "@/components/contact-form";
+import logo from "@/public/logo.png";
 
 const stats = [
   { label: "dự án doanh nghiệp/năm", value: "250+" },
@@ -75,8 +78,11 @@ export default function Home() {
       <main className="mx-auto flex max-w-6xl flex-col gap-20 px-6 py-12 lg:px-0 lg:py-20">
         <section className="grid gap-12 rounded-[32px] border border-black/5 bg-white/60 p-10 shadow-lg shadow-black/5 backdrop-blur-lg lg:grid-cols-[1.2fr,0.8fr]">
           <div className="space-y-8">
-            <p className="inline-flex items-center rounded-full bg-black text-white px-4 py-1 text-xs uppercase tracking-[0.3em]">
-              F Production Studio
+            <p className="inline-flex items-center gap-2 rounded-full bg-black/90 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+              <span className="relative block h-5 w-5">
+                <Image src={logo} alt="F.Production logo" fill className="object-contain" priority />
+              </span>
+              F.Production Studio
             </p>
             <h1 className="text-4xl font-semibold leading-tight text-black lg:text-5xl">
               Dịch vụ chụp ảnh & studio cao cấp dành cho thương hiệu Việt.
@@ -145,7 +151,7 @@ export default function Home() {
               Dịch vụ
             </p>
             <h2 className="text-3xl font-semibold text-foreground">
-              Các gói chụp chủ lực tại F Production.
+              Các gói chụp chủ lực tại F.Production.
             </h2>
             <p className="text-base text-foreground/80">
               Thiết kế để đáp ứng nhu cầu marketing, thương mại điện tử và truyền

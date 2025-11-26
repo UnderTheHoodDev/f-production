@@ -157,7 +157,7 @@ export function ContactForm() {
         </p>
       )}
       <p className="text-xs text-gray-500">
-        Gửi form đồng nghĩa bạn đồng ý với việc F Production liên hệ qua email/
+        Gửi form đồng nghĩa bạn đồng ý với việc F.Production liên hệ qua email/
         điện thoại để tư vấn chi tiết.
       </p>
     </form>

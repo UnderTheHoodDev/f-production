@@ -40,7 +40,7 @@ export async function GET() {
   return NextResponse.json({
     services: studioServices,
     notice:
-      "Các gói dịch vụ linh hoạt theo bối cảnh thực tế. Liên hệ đội ngũ F Production để nhận proposal chi tiết.",
+      "Các gói dịch vụ linh hoạt theo bối cảnh thực tế. Liên hệ đội ngũ F.Production để nhận proposal chi tiết.",
   });
 }
 
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
   const response: ContactResponseDto = {
     success: true,
     message:
-      "Cảm ơn bạn đã liên hệ. Đội ngũ F Production sẽ phản hồi trong vòng 1 giờ làm việc.",
+      "Cảm ơn bạn đã liên hệ. Đội ngũ F.Production sẽ phản hồi trong vòng 1 giờ làm việc.",
     referenceId,
   };
 
