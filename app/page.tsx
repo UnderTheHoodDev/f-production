@@ -141,13 +141,13 @@ export default function Home() {
 
         <section id="dich-vu" className="space-y-6">
           <div className="flex flex-col gap-2">
-            <p className="text-sm uppercase tracking-[0.4em] text-muted">
+            <p className="text-sm uppercase tracking-[0.4em] text-foreground/70">
               Dịch vụ
             </p>
-            <h2 className="text-3xl font-semibold text-black">
+            <h2 className="text-3xl font-semibold text-foreground">
               Các gói chụp chủ lực tại F Production.
             </h2>
-            <p className="text-base text-muted">
+            <p className="text-base text-foreground/80">
               Thiết kế để đáp ứng nhu cầu marketing, thương mại điện tử và truyền
               thông nội bộ với timeline rõ ràng.
             </p>
@@ -207,13 +207,13 @@ export default function Home() {
 
         <section id="stack" className="space-y-8">
           <div className="flex flex-col gap-2">
-            <p className="text-sm uppercase tracking-[0.4em] text-muted">
+            <p className="text-sm uppercase tracking-[0.4em] text-foreground/70">
               Next.js Full-stack
             </p>
-            <h2 className="text-3xl font-semibold text-black">
+            <h2 className="text-3xl font-semibold text-foreground">
               Một dự án Next.js duy nhất cho cả frontend và backend.
             </h2>
-            <p className="text-base text-muted">
+            <p className="text-base text-foreground/80">
               Tận dụng App Router, Route Handlers và TypeScript DTO để team marketing
               và kỹ thuật cộng tác nhanh chóng.
             </p>
