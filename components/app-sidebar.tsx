@@ -3,22 +3,12 @@
 import Image from "next/image";
 import * as React from "react";
 import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-} from "@tabler/icons-react";
+  CalendarClock,
+  Handshake,
+  Images,
+  LayoutDashboard,
+  PhoneCall,
+} from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -44,80 +34,53 @@ const data = {
     {
       title: "Dashboard",
       url: "#",
-      icon: IconDashboard,
+      icon: LayoutDashboard,
     },
     {
-      title: "Lifecycle",
+      title: "Ảnh/Video",
       url: "#",
-      icon: IconListDetails,
+      icon: Images,
     },
     {
-      title: "Analytics",
+      title: "Sự kiện",
       url: "#",
-      icon: IconChartBar,
+      icon: CalendarClock,
     },
     {
-      title: "Projects",
+      title: "Dịch vụ",
       url: "#",
-      icon: IconFolder,
+      icon: Handshake,
     },
     {
-      title: "Team",
+      title: "Liên hệ",
       url: "#",
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      icon: PhoneCall,
     },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const handleDashboardClick = React.useCallback<
+    React.MouseEventHandler<HTMLButtonElement>
+  >(async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch("/api/debug/images");
+      const result = await response.json();
+      console.log("Prisma Image records:", result?.images ?? result);
+    } catch (error) {
+      console.error("Không thể lấy danh sách ảnh từ Prisma.", error);
+    }
+  }, []);
+
+  const navItems = React.useMemo(
+    () =>
+      data.navMain.map((item) =>
+        item.title === "Dashboard" ? { ...item, onClick: handleDashboardClick } : item
+      ),
+    [handleDashboardClick]
+  );
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -143,7 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
