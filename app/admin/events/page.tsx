@@ -13,9 +13,19 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { EventsTable } from "@/components/events/events-table"
+import { EventFormDrawer } from "@/components/events/event-form-drawer"
+import { prisma } from "@/lib/prisma"
+import { Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { EventsPageClient } from "@/components/events/events-page-client"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-export default function Page() {
+export default async function EventsPage() {
+  const events = await prisma.event.findMany({
+    orderBy: { createdAt: "desc" },
+  })
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -30,11 +40,13 @@ export default function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/admin/dashboard">Admin</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin/dashboard">
+                    Admin
+                  </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                  <BreadcrumbPage>Sự kiện</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -44,14 +56,10 @@ export default function Page() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-          </div>
-          <div className="bg-muted/50 min-h-screen flex-1 rounded-xl md:min-h-min" />
+          <EventsPageClient initialEvents={events} />
         </div>
       </SidebarInset>
     </SidebarProvider>
   )
 }
+

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { ComponentType, MouseEventHandler } from "react";
 
 import { Collapsible } from "@/components/ui/collapsible";
@@ -26,21 +27,42 @@ export function NavMain({ items }: { items: NavItem[] }) {
   return (
     <SidebarGroup>
       <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <SidebarMenuButton tooltip={item.title} onClick={item.onClick}>
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
+        {items.map((item) => {
+          const buttonContent = (
+            <>
+              {item.icon && <item.icon />}
+              <span>{item.title}</span>
+            </>
+          );
+
+          return (
+            <Collapsible
+              key={item.title}
+              asChild
+              defaultOpen={item.isActive}
+              className="group/collapsible"
+            >
+              <SidebarMenuItem>
+                {item.url && item.url !== "#" ? (
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    onClick={item.onClick}
+                    asChild
+                  >
+                    <Link href={item.url}>{buttonContent}</Link>
+                  </SidebarMenuButton>
+                ) : (
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    onClick={item.onClick}
+                  >
+                    {buttonContent}
+                  </SidebarMenuButton>
+                )}
+              </SidebarMenuItem>
+            </Collapsible>
+          );
+        })}
       </SidebarMenu>
     </SidebarGroup>
   );

@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar"
+import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,16 +6,29 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
+} from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { prisma } from "@/lib/prisma";
+import { ServicesPageClient } from "@/components/services/services-page-client";
 
-export default function Page() {
+export default async function ServicesPage() {
+  const services = await prisma.service.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  const events = await prisma.event.findMany({
+    select: {
+      id: true,
+      title: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -34,24 +47,28 @@ export default function Page() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                  <BreadcrumbPage>Dịch vụ</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <div className="flex items-center gap-2 px-4">
+          <div className="px-4">
             <ThemeToggle />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
+        <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground">
+              Quản lý dịch vụ
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Quản lý các dịch vụ và thứ tự sự kiện cho từng dịch vụ
+            </p>
           </div>
-          <div className="bg-muted/50 min-h-screen flex-1 rounded-xl md:min-h-min" />
+          <ServicesPageClient initialServices={services} initialEvents={events} />
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
+

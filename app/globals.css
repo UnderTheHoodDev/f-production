@@ -10,7 +10,8 @@
   --background: #05302c;
   --background-secondary: #09403b;
   --foreground: #ffffff;
-  --foreground-secondary: #323c4a;
+  /* Sử dụng màu xanh tối từ bảng màu cho secondary text */
+  --foreground-secondary: #414e5f;
   --muted: #5c5c5c;
   --brand: #d9b588;
   --brand-dark: #c1905f;
@@ -93,36 +94,60 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #021715;
-    --background-secondary: #042220;
-    --foreground: #f4f8f7;
-    --foreground-secondary: #cfd6db;
-    --muted: #7a8791;
-    --muted-foreground: #dde2e6;
-    --surface: #052d28;
-    --surface-alt: #083a33;
-    --card: #042220;
-    --card-foreground: var(--foreground);
-    --popover: #042220;
-    --popover-foreground: var(--foreground);
-    --secondary: var(--surface-alt);
-    --secondary-foreground: var(--foreground);
-    --border: rgba(255, 255, 255, 0.12);
-    --input: rgba(255, 255, 255, 0.2);
-    --ring: #f2d7a0;
-    --sidebar: #042220;
-    --sidebar-foreground: var(--foreground);
-  }
+/* Light theme - applied when html has class "light" */
+html.light {
+  --background: #f8faf9;
+  --background-secondary: #f0f5f3;
+  /* Sử dụng màu xanh tối từ bảng màu cho text */
+  --foreground: #323c4a;
+  --foreground-secondary: #414e5f;
+  /* Muted background nhẹ cho hover states (table, buttons, etc.) */
+  --muted: #e8f0ee;
+  --muted-foreground: #6b7280;
+  --surface: #ffffff;
+  --surface-alt: #f5f7f6;
+  --card: #ffffff;
+  --card-foreground: var(--foreground);
+  --popover: #ffffff;
+  --popover-foreground: var(--foreground);
+  --primary: var(--brand);
+  --primary-foreground: #1f1f1f;
+  --secondary: var(--surface-alt);
+  --secondary-foreground: var(--foreground);
+  --accent: #e8f0ee;
+  --accent-foreground: var(--foreground);
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.04);
+  --ring: #d9b588;
+  --sidebar: #f0f5f3;
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: #1f1f1f;
+  --sidebar-accent: #e8f0ee;
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: rgba(0, 0, 0, 0.08);
+  --sidebar-ring: var(--ring);
 }
+
+/* Dark theme - sử dụng màu gốc từ :root (#05302c) */
+/* Không cần override vì :root đã có màu dark theme mặc định */
 
 body {
   min-height: 100vh;
-  background: radial-gradient(circle at 20% 0%, #e7cea3 0%, var(--background) 60%);
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, sans-serif;
   line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body,
+html:not(.light) body {
+  background: radial-gradient(circle at 20% 0%, #e7cea3 0%, var(--background) 60%);
+}
+
+html.light main {
+  background: radial-gradient(circle at 20% 0%, #fdf6ec 0%, var(--background) 60%);
 }
 
 a {
@@ -133,55 +158,6 @@ a {
 ::selection {
   background: var(--brand);
   color: white;
-}
-
-.dark {
-  --background: #021715;
-  --background-secondary: #031f1d;
-  --foreground: #f4f8f7;
-  --foreground-secondary: #cfd6db;
-  --muted: #7a8791;
-  --brand: #e1c397;
-  --brand-dark: #c1905f;
-  --surface: #052d28;
-  --surface-alt: #083a33;
-  --card: #042220;
-  --card-foreground: var(--foreground);
-  --popover: #042220;
-  --popover-foreground: var(--foreground);
-  --primary: var(--brand);
-  --primary-foreground: #1f1f1f;
-  --secondary: var(--surface-alt);
-  --secondary-foreground: var(--foreground);
-  --muted-foreground: #dde2e6;
-  --accent: var(--background-secondary);
-  --accent-foreground: var(--foreground);
-  --destructive: #df5b4a;
-  --border: rgba(255, 255, 255, 0.12);
-  --input: rgba(255, 255, 255, 0.2);
-  --ring: #f2d7a0;
-  --chart-1: #f2c479;
-  --chart-2: #d9b588;
-  --chart-3: #b48a54;
-  --chart-4: #6f8a87;
-  --chart-5: #323c4a;
-  --sidebar: #042220;
-  --sidebar-foreground: var(--foreground);
-  --sidebar-primary: var(--brand);
-  --sidebar-primary-foreground: #1f1f1f;
-  --sidebar-accent: var(--surface-alt);
-  --sidebar-accent-foreground: var(--foreground);
-  --sidebar-border: rgba(255, 255, 255, 0.12);
-  --sidebar-ring: var(--ring);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply text-foreground;
-  }
 }
 
 @layer base {

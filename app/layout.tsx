@@ -21,7 +21,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
+    <html lang="vi" suppressHydrationWarning className="dark">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  // Chỉ set theme cho trang admin
+                  const path = window.location.pathname;
+                  if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
+                    const theme = localStorage.getItem('fproduction-theme') || 'dark';
+                    document.documentElement.classList.add(theme);
+                  } else {
+                    // Trang login và root luôn dùng dark theme
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={`${montserrat.variable} antialiased`}>
         {children}
       </body>

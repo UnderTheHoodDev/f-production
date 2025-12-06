@@ -33,22 +33,22 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/admin/dashboard",
       icon: LayoutDashboard,
     },
     {
       title: "Ảnh/Video",
-      url: "#",
+      url: "/admin/media",
       icon: Images,
     },
     {
       title: "Sự kiện",
-      url: "#",
+      url: "/admin/events",
       icon: CalendarClock,
     },
     {
       title: "Dịch vụ",
-      url: "#",
+      url: "/admin/services",
       icon: Handshake,
     },
     {
@@ -62,9 +62,9 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const handleDashboardClick = React.useCallback<
     React.MouseEventHandler<HTMLButtonElement>
-  >(async (event) => {
-    event.preventDefault();
+  >(async () => {
     try {
+      console.log("Fetching images...");
       const response = await fetch("/api/debug/images");
       const result = await response.json();
       console.log("Prisma Image records:", result?.images ?? result);
@@ -90,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5"
             >
-              <a href="#">
+              <a href="/admin/dashboard">
                 <Image
                   src={logo}
                   alt="F.Production logo"
