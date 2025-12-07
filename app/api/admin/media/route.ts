@@ -13,7 +13,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { url } = await request.json();
+    const { url, publicId, title, format } = await request.json();
 
     if (!url || typeof url !== "string") {
       return NextResponse.json(
@@ -22,9 +22,19 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!publicId || typeof publicId !== "string") {
+      return NextResponse.json(
+        { success: false, message: "Thiếu publicId ảnh cần lưu." },
+        { status: 400 }
+      );
+    }
+
     const image = await prisma.image.create({
       data: {
         url,
+        publicId,
+        title: title && typeof title === "string" ? title : null,
+        format: format && typeof format === "string" ? format : null,
       },
     });
 

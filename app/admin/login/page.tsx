@@ -10,13 +10,14 @@ export const metadata: Metadata = {
 }
 
 type AdminLoginPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     redirectTo?: string
-  }
+  }>
 }
 
-export default function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
-  const redirectTo = sanitizeAdminRedirect(searchParams?.redirectTo)
+export default async function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
+  const params = await searchParams
+  const redirectTo = sanitizeAdminRedirect(params?.redirectTo)
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,#fdf6ec,#eef4f1_55%,#e8efed)] text-foreground">
