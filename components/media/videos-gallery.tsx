@@ -2,8 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { CldImage } from "next-cloudinary";
-import { MoreVertical, CheckSquare, Square, Trash2, Calendar } from "lucide-react";
+import { MoreVertical, Play, CheckSquare, Square, Trash2, Calendar } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -20,9 +19,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ImageViewer } from "@/components/media/image-viewer";
+import { VideoViewer } from "@/components/media/video-viewer";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import { ImageEditDialog } from "@/components/media/image-edit-dialog";
+import { VideoEditDialog } from "@/components/media/video-edit-dialog";
 import { MultiSelect } from "@/components/ui/multi-select";
 
 type Event = {
@@ -30,36 +29,51 @@ type Event = {
   title: string;
 };
 
-type ImageItem = {
+type VideoItem = {
   id: string;
   title: string | null;
-  format: string | null;
-  url: string | null;
-  publicId: string | null;
+  youtubeUrl: string | null;
+  thumbnail: string | null;
   createdAt: Date;
   updatedAt: Date;
   events?: Event[];
 };
 
-type ImagesGalleryProps = {
-  items: ImageItem[];
+type VideosGalleryProps = {
+  items: VideoItem[];
 };
 
 type SortOption = "createdAt-desc" | "createdAt-asc" | "updatedAt-desc" | "updatedAt-asc";
 
-export function ImagesGallery({ items }: ImagesGalleryProps) {
+// Extract YouTube video ID from URL
+function getYouTubeVideoId(url: string | null): string | null {
+  if (!url) return null;
+  
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
+}
+
+// Get YouTube thumbnail URL
+function getYouTubeThumbnail(videoId: string | null): string | null {
+  if (!videoId) return null;
+  return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+}
+
+export function VideosGallery({ items }: VideosGalleryProps) {
   const router = useRouter();
   const [sortBy, setSortBy] = useState<SortOption>("createdAt-desc");
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [imageToDelete, setImageToDelete] = useState<{
+  const [videoToDelete, setVideoToDelete] = useState<{
     id: string;
     title: string | null;
   } | null>(null);
-  const [imageToEdit, setImageToEdit] = useState<ImageItem | null>(null);
+  const [videoToEdit, setVideoToEdit] = useState<VideoItem | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeletingMultiple, setIsDeletingMultiple] = useState(false);
-  const [imagesToDeleteMultiple, setImagesToDeleteMultiple] = useState<string[] | null>(null);
+  const [videosToDeleteMultiple, setVideosToDeleteMultiple] = useState<string[] | null>(null);
   const [showEventSelector, setShowEventSelector] = useState(false);
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
@@ -91,38 +105,46 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
     }
   }, [items, sortBy]);
 
-  const handleDeleteClick = (imageId: string, imageTitle: string | null) => {
-    setImageToDelete({ id: imageId, title: imageTitle });
+  const handleDeleteClick = (videoId: string, videoTitle: string | null) => {
+    setVideoToDelete({ id: videoId, title: videoTitle });
   };
 
-  const handleEditClick = (item: ImageItem) => {
-    setImageToEdit(item);
+  const handleEditClick = (item: VideoItem) => {
+    setVideoToEdit(item);
   };
 
-  const handleSave = async (imageId: string, data: { title: string | null; eventIds: string[] }) => {
-    const response = await fetch(`/api/admin/media/${imageId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+  const handleSave = async (videoId: string, data: { title: string | null; eventIds: string[] }) => {
+    try {
+      setIsSaving(true);
+      const response = await fetch(`/api/admin/videos/${videoId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    if (!response.ok) {
-      const payload = await response.json().catch(() => ({}));
-      throw new Error(payload?.message ?? "Không thể cập nhật ảnh.");
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload?.message ?? "Không thể cập nhật video.");
+      }
+
+      router.refresh();
+    } catch (error) {
+      console.error("Save failed", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
     }
-
-    router.refresh();
   };
 
-  const handleToggleSelect = (imageId: string) => {
+  const handleToggleSelect = (videoId: string) => {
     setSelectedIds((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(imageId)) {
-        newSet.delete(imageId);
+      if (newSet.has(videoId)) {
+        newSet.delete(videoId);
       } else {
-        newSet.add(imageId);
+        newSet.add(videoId);
       }
       return newSet;
     });
@@ -138,16 +160,16 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
 
   const handleDeleteMultiple = () => {
     const ids = Array.from(selectedIds);
-    setImagesToDeleteMultiple(ids);
+    setVideosToDeleteMultiple(ids);
   };
 
   const performDeleteMultiple = async () => {
-    if (!imagesToDeleteMultiple || imagesToDeleteMultiple.length === 0) return;
+    if (!videosToDeleteMultiple || videosToDeleteMultiple.length === 0) return;
 
     try {
       setIsDeletingMultiple(true);
-      const deletePromises = imagesToDeleteMultiple.map((id) =>
-        fetch(`/api/admin/media/${id}`, {
+      const deletePromises = videosToDeleteMultiple.map((id) =>
+        fetch(`/api/admin/videos/${id}`, {
           method: "DELETE",
         })
       );
@@ -157,16 +179,16 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
       for (const response of responses) {
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));
-          throw new Error(payload?.message ?? "Không thể xóa một số ảnh.");
+          throw new Error(payload?.message ?? "Không thể xóa một số video.");
         }
       }
 
       setSelectedIds(new Set());
-      setImagesToDeleteMultiple(null);
+      setVideosToDeleteMultiple(null);
       router.refresh();
     } catch (error) {
       console.error("Delete multiple failed", error);
-      alert(error instanceof Error ? error.message : "Có lỗi xảy ra khi xóa ảnh.");
+      alert(error instanceof Error ? error.message : "Có lỗi xảy ra khi xóa video.");
     } finally {
       setIsDeletingMultiple(false);
     }
@@ -195,10 +217,10 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
 
     try {
       setIsUpdatingEvents(true);
-      const imageIds = Array.from(selectedIds);
+      const videoIds = Array.from(selectedIds);
       
-      const updatePromises = imageIds.map((imageId) =>
-        fetch(`/api/admin/media/${imageId}`, {
+      const updatePromises = videoIds.map((videoId) =>
+        fetch(`/api/admin/videos/${videoId}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -214,7 +236,7 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
       for (const response of responses) {
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));
-          throw new Error(payload?.message ?? "Không thể cập nhật một số ảnh.");
+          throw new Error(payload?.message ?? "Không thể cập nhật một số video.");
         }
       }
 
@@ -231,24 +253,24 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
   };
 
   const performDelete = async () => {
-    if (!imageToDelete) return;
+    if (!videoToDelete) return;
 
     try {
-      setDeletingId(imageToDelete.id);
-      const response = await fetch(`/api/admin/media/${imageToDelete.id}`, {
+      setDeletingId(videoToDelete.id);
+      const response = await fetch(`/api/admin/videos/${videoToDelete.id}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        throw new Error(payload?.message ?? "Không thể xóa ảnh.");
+        throw new Error(payload?.message ?? "Không thể xóa video.");
       }
 
-      setImageToDelete(null);
+      setVideoToDelete(null);
       router.refresh();
     } catch (error) {
       console.error("Delete failed", error);
-      alert(error instanceof Error ? error.message : "Có lỗi xảy ra khi xóa ảnh.");
+      alert(error instanceof Error ? error.message : "Có lỗi xảy ra khi xóa video.");
     } finally {
       setDeletingId(null);
     }
@@ -257,7 +279,7 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
   if (!items.length) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        Chưa có ảnh nào. Hãy tải ảnh lên Cloudinary để bắt đầu.
+        Chưa có video nào. Hãy thêm video YouTube để bắt đầu.
       </div>
     );
   }
@@ -266,7 +288,7 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
     <div className="space-y-4 pb-20">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Tổng số: {items.length} ảnh
+          Tổng số: {items.length} video
         </p>
         <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
           <SelectTrigger className="w-[200px]">
@@ -282,141 +304,153 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
       </div>
       <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
         {sortedItems.map((item) => {
+          const videoId = getYouTubeVideoId(item.youtubeUrl);
+          const thumbnailUrl = item.thumbnail || getYouTubeThumbnail(videoId);
           const isSelected = selectedIds.has(item.id);
+
           return (
-          <figure
-            key={item.id}
-            className={`group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md ${
-              isSelected 
-                ? "border-[#d9b588] ring-2 ring-[#d9b588]/30" 
-                : "border-border"
-            }`}
-          >
-            {item.title && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 dark:bg-muted/20">
-                <Checkbox
-                  checked={selectedIds.has(item.id)}
-                  onCheckedChange={() => handleToggleSelect(item.id)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="shrink-0"
-                />
-                <p className="text-xs font-medium text-foreground line-clamp-1 flex-1">
-                  {item.title}
-                  {item.format && `.${item.format}`}
-                </p>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-accent rounded-sm"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Xem chi tiết</DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditClick(item);
-                      }}
-                    >
-                      Chỉnh sửa
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(item.id, item.title);
-                      }}
-                      disabled={deletingId === item.id}
-                    >
-                      {deletingId === item.id ? "Đang xóa..." : "Xóa"}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            )}
-            {!item.title && (
-              <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                <Checkbox
-                  checked={selectedIds.has(item.id)}
-                  onCheckedChange={() => handleToggleSelect(item.id)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-background/80 backdrop-blur-sm"
-                />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="p-1 hover:bg-accent/80 rounded-sm bg-background/80 backdrop-blur-sm"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Xem chi tiết</DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditClick(item);
-                      }}
-                    >
-                      Chỉnh sửa
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(item.id, item.title);
-                      }}
-                      disabled={deletingId === item.id}
-                    >
-                      {deletingId === item.id ? "Đang xóa..." : "Xóa"}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            )}
-            <div 
-              className="relative aspect-4/3 overflow-hidden bg-muted/30 dark:bg-muted/20 p-2 cursor-pointer"
-              onDoubleClick={() => {
-                const index = sortedItems.findIndex((img) => img.id === item.id);
-                setViewerIndex(index);
-              }}
+            <figure
+              key={item.id}
+              className={`group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md ${
+                isSelected 
+                  ? "border-[#d9b588] ring-2 ring-[#d9b588]/30" 
+                  : "border-border"
+              }`}
             >
-              <CldImage
-                width="400"
-                height="300"
-                src={item.publicId || (item.url as string)}
-                alt={item.title || "Studio image"}
-                className="h-full w-full rounded-md object-cover transition-transform group-hover:opacity-80"
-                sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
-              />
-            </div>
-          </figure>
+              {item.title && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 dark:bg-muted/20">
+                  <Checkbox
+                    checked={selectedIds.has(item.id)}
+                    onCheckedChange={() => handleToggleSelect(item.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="shrink-0"
+                  />
+                  <p className="text-xs font-medium text-foreground line-clamp-1 flex-1">
+                    {item.title}
+                  </p>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-accent rounded-sm"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Xem chi tiết</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick(item);
+                        }}
+                      >
+                        Chỉnh sửa
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(item.id, item.title);
+                        }}
+                        disabled={deletingId === item.id}
+                      >
+                        {deletingId === item.id ? "Đang xóa..." : "Xóa"}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+              {!item.title && (
+                <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Checkbox
+                    checked={selectedIds.has(item.id)}
+                    onCheckedChange={() => handleToggleSelect(item.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="bg-background/80 backdrop-blur-sm"
+                  />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className="p-1 hover:bg-accent/80 rounded-sm bg-background/80 backdrop-blur-sm"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Xem chi tiết</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick(item);
+                        }}
+                      >
+                        Chỉnh sửa
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(item.id, item.title);
+                        }}
+                        disabled={deletingId === item.id}
+                      >
+                        {deletingId === item.id ? "Đang xóa..." : "Xóa"}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+              <div 
+                className="relative aspect-4/3 overflow-hidden bg-muted/30 dark:bg-muted/20 p-2 cursor-pointer"
+                onDoubleClick={() => {
+                  const index = sortedItems.findIndex((vid) => vid.id === item.id);
+                  setViewerIndex(index);
+                }}
+              >
+                {thumbnailUrl ? (
+                  <div className="relative h-full w-full rounded-md overflow-hidden">
+                    <img
+                      src={thumbnailUrl}
+                      alt={item.title || "Video thumbnail"}
+                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
+                      <div className="rounded-full bg-white/90 p-3 shadow-lg">
+                        <Play className="h-6 w-6 text-black fill-black ml-1" />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-full w-full rounded-md bg-muted flex items-center justify-center">
+                    <Play className="h-12 w-12 text-muted-foreground" />
+                  </div>
+                )}
+              </div>
+            </figure>
           );
         })}
       </div>
 
-      {/* Image Viewer Overlay */}
+      {/* Video Viewer Overlay */}
       {viewerIndex !== null && (
-        <ImageViewer
-          images={sortedItems}
+        <VideoViewer
+          videos={sortedItems}
           initialIndex={viewerIndex}
           onClose={() => setViewerIndex(null)}
         />
       )}
 
       {/* Edit Dialog */}
-      <ImageEditDialog
-        open={imageToEdit !== null}
+      <VideoEditDialog
+        open={videoToEdit !== null}
         onOpenChange={(open) => {
           if (!open) {
-            setImageToEdit(null);
+            setVideoToEdit(null);
           }
         }}
-        image={imageToEdit}
+        video={videoToEdit}
         onSave={handleSave}
       />
 
@@ -501,6 +535,7 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
                     size="sm"
                     onClick={handleOpenEventSelector}
                     className="h-8 text-sm gap-1.5 px-2"
+                    disabled={isLoadingEvents}
                   >
                     <Calendar className="h-4 w-4" />
                     Chọn sự kiện
@@ -525,35 +560,35 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
 
       {/* Delete Single Confirm Dialog */}
       <DeleteConfirmDialog
-        open={imageToDelete !== null}
+        open={videoToDelete !== null}
         onOpenChange={(open) => {
           if (!open) {
-            setImageToDelete(null);
+            setVideoToDelete(null);
           }
         }}
         onConfirm={performDelete}
-        title="Xác nhận xóa ảnh"
+        title="Xác nhận xóa video"
         description={
-          imageToDelete?.title
-            ? `Bạn có chắc chắn muốn xóa ảnh "${imageToDelete.title}"? Hành động này không thể hoàn tác.`
-            : "Bạn có chắc chắn muốn xóa ảnh này? Hành động này không thể hoàn tác."
+          videoToDelete?.title
+            ? `Bạn có chắc chắn muốn xóa video "${videoToDelete.title}"? Hành động này không thể hoàn tác.`
+            : "Bạn có chắc chắn muốn xóa video này? Hành động này không thể hoàn tác."
         }
         isLoading={deletingId !== null}
       />
 
       {/* Delete Multiple Confirm Dialog */}
       <DeleteConfirmDialog
-        open={imagesToDeleteMultiple !== null}
+        open={videosToDeleteMultiple !== null}
         onOpenChange={(open) => {
           if (!open) {
-            setImagesToDeleteMultiple(null);
+            setVideosToDeleteMultiple(null);
           }
         }}
         onConfirm={performDeleteMultiple}
-        title="Xác nhận xóa nhiều ảnh"
+        title="Xác nhận xóa nhiều video"
         description={
-          imagesToDeleteMultiple
-            ? `Bạn có chắc chắn muốn xóa ${imagesToDeleteMultiple.length} ảnh đã chọn? Hành động này không thể hoàn tác.`
+          videosToDeleteMultiple
+            ? `Bạn có chắc chắn muốn xóa ${videosToDeleteMultiple.length} video đã chọn? Hành động này không thể hoàn tác.`
             : ""
         }
         isLoading={isDeletingMultiple}

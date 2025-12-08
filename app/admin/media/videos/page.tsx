@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { ImagesGallery } from "@/components/media/images-gallery";
-import { ImageUploader } from "@/components/media/image-uploader";
+import { VideosGallery } from "@/components/media/videos-gallery";
+import { VideoUploader } from "@/components/media/video-uploader";
 import { MediaTabs } from "@/components/media/media-tabs";
 import {
   Breadcrumb,
@@ -19,8 +19,8 @@ import {
 import { prisma } from "@/lib/prisma";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export default async function ImagesPage() {
-  const images = await prisma.image.findMany({
+export default async function VideosPage() {
+  const videos = await prisma.video.findMany({
     orderBy: { createdAt: "desc" },
     include: {
       events: {
@@ -54,7 +54,7 @@ export default async function ImagesPage() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Ảnh</BreadcrumbPage>
+                  <BreadcrumbPage>Video</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -71,16 +71,16 @@ export default async function ImagesPage() {
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6">
               <div>
                 <h1 className="text-3xl font-semibold text-foreground">
-                  Quản lý ảnh studio
+                  Quản lý video studio
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Xem và quản lý tất cả ảnh liên quan đến studio. Upload ảnh mới
-                  để thêm vào thư viện.
+                  Xem và quản lý tất cả video liên quan đến studio. Thêm video YouTube
+                  mới để thêm vào thư viện.
                 </p>
               </div>
-              <ImageUploader />
+              <VideoUploader />
             </div>
-            <ImagesGallery items={images} />
+            <VideosGallery items={videos} />
           </div>
         </div>
       </SidebarInset>
