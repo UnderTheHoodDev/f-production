@@ -13,10 +13,11 @@ const NavBar = () => {
     { label: "Giới thiệu", path: "/gioi-thieu" },
     { label: "Dịch vụ", path: "/dich-vu" },
     { label: "Liên hệ", path: "/lien-he" },
+    { label: "Bảng giá", path: "/bang-gia" },
   ];
 
   return (
-    <nav className="flex items-center justify-between bg-background-secondary px-10 h-16 fixed top-0 w-full">
+    <nav className="flex items-center justify-between bg-background-secondary px-10 h-16 fixed top-0 w-full z-50">
       <Link href="/">
         <Image src="/logo.png" alt="Logo" width={48} height={48} />
       </Link>

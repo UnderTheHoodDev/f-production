@@ -7,7 +7,7 @@ import Image from "next/image";
 const OurPartners = () => {
   const [emblaRef] = useEmblaCarousel({ loop: true }, [
     AutoScroll({
-      speed: 1, // slow & smooth
+      speed: 1,
       startDelay: 0,
       stopOnInteraction: false,
     }),
@@ -29,9 +29,10 @@ const OurPartners = () => {
                 <Image
                   width={150}
                   height={150}
+                  unoptimized
                   src="/partners/samsung.png"
                   alt={`Partner ${n}`}
-                  className="object-contain"
+                  className="object-contain max-w-60 h-auto"
                 />
               </div>
             ))}
