@@ -6,7 +6,7 @@ import {
   sanitizeAdminRedirect,
 } from "@/lib/auth";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isLoginRoute = pathname.startsWith("/admin/login");
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
@@ -22,8 +22,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isAdminRoute =
-    pathname === "/admin" || pathname.startsWith("/admin/");
+  const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
 
   if (!isAdminRoute) {
     return NextResponse.next();
@@ -31,17 +30,16 @@ export async function middleware(request: NextRequest) {
 
   if (!isAuthenticated) {
     const redirectTo =
-      pathname === "/admin" ? "/admin/dashboard" : sanitizeAdminRedirect(pathname);
+      pathname === "/admin"
+        ? "/admin/dashboard"
+        : sanitizeAdminRedirect(pathname);
     const loginUrl = new URL("/admin/login", request.url);
     loginUrl.searchParams.set("redirectTo", redirectTo);
     return NextResponse.redirect(loginUrl, 307);
   }
 
   if (pathname === "/admin" || pathname === "/admin/") {
-    return NextResponse.redirect(
-      new URL("/admin/dashboard", request.url),
-      307
-    );
+    return NextResponse.redirect(new URL("/admin/dashboard", request.url), 307);
   }
 
   return NextResponse.next();
@@ -50,4 +48,3 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/admin/:path*"],
 };
-

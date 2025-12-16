@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
+import { getYouTubeVideoId } from "@/utils/youtube";
 
 type VideoItem = {
   id: string;
@@ -19,16 +21,11 @@ type VideoViewerProps = {
   onClose: () => void;
 };
 
-// Extract YouTube video ID from URL
-function getYouTubeVideoId(url: string | null): string | null {
-  if (!url) return null;
-  
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return match && match[2].length === 11 ? match[2] : null;
-}
-
-export function VideoViewer({ videos, initialIndex, onClose }: VideoViewerProps) {
+export function VideoViewer({
+  videos,
+  initialIndex,
+  onClose,
+}: VideoViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const currentVideo = videos[currentIndex];
   const videoId = getYouTubeVideoId(currentVideo.youtubeUrl);
@@ -135,4 +132,3 @@ export function VideoViewer({ videos, initialIndex, onClose }: VideoViewerProps)
     </div>
   );
 }
-
