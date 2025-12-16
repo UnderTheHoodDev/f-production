@@ -74,7 +74,7 @@ const ProductList = () => {
       </div>
       {activeProductView && (
         <ProductView
-          products={products}
+          products={products as any}
           initialIndex={activeProductIndex}
           setActiveProductView={setActiveProductView}
         />
