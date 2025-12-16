@@ -380,7 +380,7 @@ export function ImagesGallery({ items }: ImagesGalleryProps) {
             )}
             <div 
               className="relative aspect-4/3 overflow-hidden bg-muted/30 dark:bg-muted/20 p-2 cursor-pointer"
-              onDoubleClick={() => {
+              onClick={() => {
                 const index = sortedItems.findIndex((img) => img.id === item.id);
                 setViewerIndex(index);
               }}
