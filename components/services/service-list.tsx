@@ -39,7 +39,7 @@ const ServiceList = () => {
   return (
     <div className="flex flex-col gap-8 items-center justify-center py-12">
       <span className="font-bold text-4xl text-background-secondary ">
-        Dịch vụ tại F Production
+        Dịch vụ
       </span>
       <div className="flex flex-wrap gap-5 justify-center max-w-[1200px]">
         {services.map((service) => (

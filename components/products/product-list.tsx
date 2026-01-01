@@ -45,7 +45,7 @@ const ProductList = () => {
   return (
     <div className="flex flex-col gap-8 items-center justify-center py-12">
       <span className="font-bold text-4xl text-background-secondary ">
-        Sản phẩm của F Production
+        Sản phẩm
       </span>
       <div className="w-full flex flex-col gap-5 px-10 items-center">
         <div className="w-full flex flex-col items-center gap-8">

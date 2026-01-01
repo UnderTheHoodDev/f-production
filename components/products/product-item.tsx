@@ -37,7 +37,7 @@ const ProductItem = ({ type, handleActiveProductView }: ProductItemProps) => {
       </div>
       <div className="flex flex-col bg-[#F1F2F9] p-3 py-2">
         {/* TODO: Product Name ? */}
-        <span className="font-medium text-[18px] text-background-secondary">
+        <span className="font-medium text-lg text-background-secondary">
           Lorem ipsum dolor sit amet
         </span>
         {/* TODO: Client Name ? */}

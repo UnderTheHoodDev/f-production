@@ -11,7 +11,6 @@ const ProductFilterSection = ({
   selectedFilter,
 }: FilterSectionProps) => {
   const filterTypes = [
-    "TẤT CẢ",
     "TVC",
     "GIỚI THIỆU",
     "ẢNH EVENT",
@@ -75,7 +74,7 @@ const ProductFilterSection = ({
           onMouseEnter={() => handleMouseEnter(index)}
           onMouseLeave={handleMouseLeave}
           className={clsx(
-            "relative z-10 cursor-pointer rounded-4xl px-5 py-3 font-medium text-[18px] transition-colors duration-300",
+            "relative z-10 cursor-pointer rounded-4xl px-5 py-3 font-medium text-lg transition-colors duration-300",
             activeIndex === index ? "text-foreground" : "text-[#1B1B1B]"
           )}
         >

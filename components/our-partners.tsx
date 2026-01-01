@@ -21,7 +21,7 @@ const OurPartners = () => {
       <div className="px-10 py-10 w-full">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
-            {[1, 2, 3, 4, 5].map((n) => (
+            {[1, 2, 3, 4, 5, 6].map((n) => (
               <div
                 key={n}
                 className="flex-[0_0_25%] flex items-center justify-center"
