@@ -26,7 +26,7 @@ const ProductItem = ({ type, handleActiveProductView }: ProductItemProps) => {
           height={150}
           loading="lazy"
           unoptimized
-          className="aspect-video w-full"
+          className="aspect-video max-h-60 w-full"
           alt="Video Image"
         />
         {type === 'video' && (
