@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
 
+import { montserrat } from "@/app/fonts";
 import Footer from "@/components/layout/footer";
 import NavBar from "@/components/layout/nav-bar";
 
@@ -17,7 +18,7 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${montserrat.variable} font-sans`}>
       <body>
         <NextTopLoader showSpinner={false} color="#d9b588" />
         <NavBar />
