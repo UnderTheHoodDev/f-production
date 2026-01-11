@@ -17,7 +17,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { title, eventIds } = body;
+    const { title, eventIds, showOnLanding } = body;
 
     // Get image from database
     const image = await prisma.image.findUnique({
@@ -31,11 +31,12 @@ export async function PATCH(
       );
     }
 
-    // Update image with new title and events
+    // Update image with new title, events, and showOnLanding
     const updatedImage = await prisma.image.update({
       where: { id },
       data: {
         title: title !== undefined ? (title && title.trim() ? title.trim() : null) : undefined,
+        showOnLanding: showOnLanding !== undefined ? showOnLanding : undefined,
         events: eventIds
           ? {
               set: eventIds.map((eventId: string) => ({ id: eventId })),

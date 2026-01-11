@@ -19,6 +19,7 @@ model Image {
   format String?
   url String?
   publicId String?
+  showOnLanding Boolean @default(false)
   events Event[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -29,6 +30,7 @@ model Video {
   youtubeUrl String?
   title String?
   thumbnail String?
+  showOnLanding Boolean @default(false)
   events Event[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -92,6 +92,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --breakpoint-xsm: 30rem;
 }
 
 /* Light theme - applied when html has class "light" */
@@ -136,6 +137,10 @@ a {
 ::selection {
   background: var(--brand);
   color: white;
+}
+
+.layout-padding {
+  @apply px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20;
 }
 
 @layer base {

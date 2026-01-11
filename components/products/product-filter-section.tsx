@@ -1,5 +1,5 @@
-import clsx from "clsx";
-import { useLayoutEffect, useRef, useState } from "react";
+import clsx from 'clsx';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 interface FilterSectionProps {
   handleFilterType: (type: string) => void;
@@ -11,12 +11,11 @@ const ProductFilterSection = ({
   selectedFilter,
 }: FilterSectionProps) => {
   const filterTypes = [
-    "TẤT CẢ",
-    "TVC",
-    "GIỚI THIỆU",
-    "ẢNH EVENT",
-    "PHIM NGẮN",
-    "MV CA NHẠC",
+    'TVC',
+    'GIỚI THIỆU',
+    'ẢNH EVENT',
+    'PHIM NGẮN',
+    'MV CA NHẠC',
   ];
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,7 +25,9 @@ const ProductFilterSection = ({
     filterTypes.findIndex((t) => t === selectedFilter)
   );
   const [width, setWidth] = useState(0);
-  const [position, setPosition] = useState(0);
+  const [height, setHeight] = useState(0);
+  const [positionX, setPositionX] = useState(0);
+  const [positionY, setPositionY] = useState(0);
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleMouseLeave = () => {
@@ -53,16 +54,22 @@ const ProductFilterSection = ({
     const parentRect = parent.getBoundingClientRect();
 
     setWidth(elRect.width);
-    setPosition(elRect.left - parentRect.left);
+    setHeight(elRect.height);
+    setPositionX(elRect.left - parentRect.left);
+    setPositionY(elRect.top - parentRect.top);
   }, [activeIndex]);
 
   return (
-    <div ref={containerRef} className="relative flex gap-8">
+    <div
+      ref={containerRef}
+      className="relative flex flex-wrap justify-center gap-2 md:gap-4 lg:gap-8"
+    >
       <div
-        className="absolute top-0 left-0 h-full rounded-4xl bg-background-secondary transition-all duration-300 ease-out"
+        className="bg-background-secondary absolute top-0 left-0 rounded-4xl transition-all duration-300 ease-out"
         style={{
           width,
-          transform: `translateX(${position}px)`,
+          height,
+          transform: `translate(${positionX}px, ${positionY}px)`,
         }}
       />
       {filterTypes.map((type, index) => (
@@ -75,8 +82,8 @@ const ProductFilterSection = ({
           onMouseEnter={() => handleMouseEnter(index)}
           onMouseLeave={handleMouseLeave}
           className={clsx(
-            "relative z-10 cursor-pointer rounded-4xl px-5 py-3 font-medium text-[18px] transition-colors duration-300",
-            activeIndex === index ? "text-foreground" : "text-[#1B1B1B]"
+            'relative z-10 cursor-pointer rounded-4xl px-4 py-2 font-medium transition-colors duration-300 sm:text-base md:px-5 md:py-3 lg:text-lg',
+            activeIndex === index ? 'text-foreground' : 'text-[#1B1B1B]'
           )}
         >
           {type}

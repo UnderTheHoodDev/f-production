@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { MoreVertical, Play, CheckSquare, Square, Trash2, Calendar } from "lucide-react";
+import { MoreVertical, Play, CheckSquare, Square, Trash2, Calendar, Eye, EyeOff } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +34,7 @@ type VideoItem = {
   title: string | null;
   youtubeUrl: string | null;
   thumbnail: string | null;
+  showOnLanding?: boolean;
   createdAt: Date;
   updatedAt: Date;
   events?: Event[];
@@ -79,6 +80,8 @@ export function VideosGallery({ items }: VideosGalleryProps) {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(false);
   const [isUpdatingEvents, setIsUpdatingEvents] = useState(false);
+  const [showLandingSelector, setShowLandingSelector] = useState(false);
+  const [isUpdatingLanding, setIsUpdatingLanding] = useState(false);
 
   const sortedItems = useMemo(() => {
     const sorted = [...items];
@@ -113,7 +116,7 @@ export function VideosGallery({ items }: VideosGalleryProps) {
     setVideoToEdit(item);
   };
 
-  const handleSave = async (videoId: string, data: { title: string | null; eventIds: string[] }) => {
+  const handleSave = async (videoId: string, data: { title: string | null; eventIds: string[]; showOnLanding: boolean }) => {
     try {
       setIsSaving(true);
       const response = await fetch(`/api/admin/videos/${videoId}`, {
@@ -209,6 +212,45 @@ export function VideosGallery({ items }: VideosGalleryProps) {
       } finally {
         setIsLoadingEvents(false);
       }
+    }
+  };
+
+  const handleUpdateLandingBulk = async (showOnLanding: boolean) => {
+    if (selectedIds.size === 0) return;
+
+    try {
+      setIsUpdatingLanding(true);
+      const videoIds = Array.from(selectedIds);
+      
+      const updatePromises = videoIds.map((videoId) =>
+        fetch(`/api/admin/videos/${videoId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            showOnLanding,
+          }),
+        })
+      );
+
+      const responses = await Promise.all(updatePromises);
+      
+      for (const response of responses) {
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload?.message ?? "Không thể cập nhật một số video.");
+        }
+      }
+
+      setShowLandingSelector(false);
+      setSelectedIds(new Set());
+      router.refresh();
+    } catch (error) {
+      console.error("Update landing bulk failed", error);
+      alert(error instanceof Error ? error.message : "Có lỗi xảy ra khi cập nhật.");
+    } finally {
+      setIsUpdatingLanding(false);
     }
   };
 
@@ -527,7 +569,7 @@ export function VideosGallery({ items }: VideosGalleryProps) {
                   </div>
                 </>
               )}
-              {!showEventSelector && (
+              {!showEventSelector && !showLandingSelector && (
                 <>
                   <Separator orientation="vertical" className="h-5!" />
                   <Button
@@ -540,6 +582,50 @@ export function VideosGallery({ items }: VideosGalleryProps) {
                     <Calendar className="h-4 w-4" />
                     Chọn sự kiện
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowLandingSelector(true)}
+                    className="h-8 text-sm gap-1.5 px-2"
+                  >
+                    <Eye className="h-4 w-4" />
+                    Hiển thị trang chủ
+                  </Button>
+                </>
+              )}
+              {showLandingSelector && (
+                <>
+                  <Separator orientation="vertical" className="h-5!" />
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => handleUpdateLandingBulk(true)}
+                      className="h-8 text-sm gap-1.5 px-2"
+                      disabled={isUpdatingLanding}
+                    >
+                      <Eye className="h-4 w-4" />
+                      {isUpdatingLanding ? "Đang cập nhật..." : "Hiển thị"}
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleUpdateLandingBulk(false)}
+                      className="h-8 text-sm gap-1.5 px-2"
+                      disabled={isUpdatingLanding}
+                    >
+                      <EyeOff className="h-4 w-4" />
+                      {isUpdatingLanding ? "Đang cập nhật..." : "Ẩn"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowLandingSelector(false)}
+                      className="h-8 text-sm px-2"
+                    >
+                      Hủy
+                    </Button>
+                  </div>
                 </>
               )}
             </div>
