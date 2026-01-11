@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type Event = {
   id: string;
@@ -22,6 +23,7 @@ type Event = {
 type ImageItem = {
   id: string;
   title: string | null;
+  showOnLanding?: boolean;
   events?: Event[];
 };
 
@@ -29,7 +31,7 @@ type ImageEditDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   image: ImageItem | null;
-  onSave: (imageId: string, data: { title: string | null; eventIds: string[] }) => Promise<void>;
+  onSave: (imageId: string, data: { title: string | null; eventIds: string[]; showOnLanding: boolean }) => Promise<void>;
 };
 
 export function ImageEditDialog({
@@ -39,6 +41,7 @@ export function ImageEditDialog({
   onSave,
 }: ImageEditDialogProps) {
   const [title, setTitle] = useState("");
+  const [showOnLanding, setShowOnLanding] = useState(false);
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +71,7 @@ export function ImageEditDialog({
   useEffect(() => {
     if (image) {
       setTitle(image.title || "");
+      setShowOnLanding(image.showOnLanding || false);
       setSelectedEventIds(image.events?.map((e) => e.id) || []);
     }
   }, [image]);
@@ -80,6 +84,7 @@ export function ImageEditDialog({
       await onSave(image.id, {
         title: title.trim() || null,
         eventIds: selectedEventIds,
+        showOnLanding,
       });
       onOpenChange(false);
     } catch (error) {
@@ -126,6 +131,19 @@ export function ImageEditDialog({
                 placeholder="Chọn sự kiện..."
               />
             )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showOnLanding"
+              checked={showOnLanding}
+              onCheckedChange={(checked) => setShowOnLanding(checked as boolean)}
+            />
+            <Label
+              htmlFor="showOnLanding"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Hiển thị trên trang chủ
+            </Label>
           </div>
         </div>
         <DialogFooter>

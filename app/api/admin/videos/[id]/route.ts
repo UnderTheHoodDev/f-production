@@ -9,7 +9,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { title, eventIds } = body;
+    const { title, eventIds, showOnLanding } = body;
 
     // Get video from database
     const video = await prisma.video.findUnique({
@@ -23,11 +23,12 @@ export async function PATCH(
       );
     }
 
-    // Update video with new title and events
+    // Update video with new title, events, and showOnLanding
     const updatedVideo = await prisma.video.update({
       where: { id },
       data: {
         title: title !== undefined ? (title && title.trim() ? title.trim() : null) : undefined,
+        showOnLanding: showOnLanding !== undefined ? showOnLanding : undefined,
         events: eventIds
           ? {
               set: eventIds.map((eventId: string) => ({ id: eventId })),

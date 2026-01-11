@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type Event = {
   id: string;
@@ -22,6 +23,7 @@ type Event = {
 type VideoItem = {
   id: string;
   title: string | null;
+  showOnLanding?: boolean;
   events?: Event[];
 };
 
@@ -29,7 +31,7 @@ type VideoEditDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   video: VideoItem | null;
-  onSave: (videoId: string, data: { title: string | null; eventIds: string[] }) => Promise<void>;
+  onSave: (videoId: string, data: { title: string | null; eventIds: string[]; showOnLanding: boolean }) => Promise<void>;
 };
 
 export function VideoEditDialog({
@@ -39,6 +41,7 @@ export function VideoEditDialog({
   onSave,
 }: VideoEditDialogProps) {
   const [title, setTitle] = useState("");
+  const [showOnLanding, setShowOnLanding] = useState(false);
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +71,7 @@ export function VideoEditDialog({
   useEffect(() => {
     if (video) {
       setTitle(video.title || "");
+      setShowOnLanding(video.showOnLanding || false);
       setSelectedEventIds(video.events?.map((e) => e.id) || []);
     }
   }, [video]);
@@ -80,6 +84,7 @@ export function VideoEditDialog({
       await onSave(video.id, {
         title: title.trim() || null,
         eventIds: selectedEventIds,
+        showOnLanding,
       });
       onOpenChange(false);
     } catch (error) {
@@ -127,6 +132,19 @@ export function VideoEditDialog({
               />
             )}
           </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showOnLanding"
+              checked={showOnLanding}
+              onCheckedChange={(checked) => setShowOnLanding(checked as boolean)}
+            />
+            <Label
+              htmlFor="showOnLanding"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Hiển thị trên trang chủ
+            </Label>
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
@@ -140,4 +158,3 @@ export function VideoEditDialog({
     </Dialog>
   );
 }
-
