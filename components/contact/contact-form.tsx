@@ -4,9 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useForm } from "@tanstack/react-form";
 import { clsx } from "clsx";
-import React from "react";
+import React, { useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 
 const FORM_FIELDS = [
   {
@@ -14,6 +22,7 @@ const FORM_FIELDS = [
     label: "Họ và tên",
     placeholder: "Điền họ và tên của bạn",
     type: "input",
+    required: true,
     validator: (value: string) =>
       !value ? "Họ và tên là bắt buộc" : undefined,
   },
@@ -22,6 +31,7 @@ const FORM_FIELDS = [
     label: "Số điện thoại",
     placeholder: "Điền số điện thoại của bạn",
     type: "input",
+    required: true,
     validator: (value: string) => {
       if (!value) return "Số điện thoại là bắt buộc";
       if (!/^[0-9]{10}$/.test(value.replace(/\s/g, ""))) {
@@ -35,7 +45,8 @@ const FORM_FIELDS = [
     label: "Địa chỉ",
     placeholder: "Điền địa chỉ của bạn",
     type: "input",
-    validator: (value: string) => (!value ? "Địa chỉ là bắt buộc" : undefined),
+    required: false,
+    validator: undefined,
   },
   {
     name: "content" as const,
@@ -43,7 +54,8 @@ const FORM_FIELDS = [
     placeholder: "Điền nội dung",
     type: "textarea",
     rows: 5,
-    validator: (value: string) => (!value ? "Nội dung là bắt buộc" : undefined),
+    required: false,
+    validator: undefined,
   },
 ];
 
@@ -55,6 +67,10 @@ const INPUT_CLASSES = clsx(
 );
 
 export default function ContactForm() {
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const form = useForm({
     defaultValues: {
       fullName: "",
@@ -63,8 +79,36 @@ export default function ContactForm() {
       content: "",
     },
     onSubmit: async ({ value }) => {
-      console.log("Form submitted:", value);
-      alert("Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất.");
+      setErrorMessage("");
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(value),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Không thể gửi thông tin, hãy thử lại.");
+        }
+
+        setSuccessMessage(
+          data.message || "Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất."
+        );
+        setIsSuccessDialogOpen(true);
+        
+        // Reset form sau khi gửi thành công
+        form.reset();
+      } catch (error) {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Có lỗi xảy ra, vui lòng thử lại."
+        );
+      }
     },
   });
 
@@ -92,9 +136,13 @@ export default function ContactForm() {
             <form.Field
               key={fieldConfig.name}
               name={fieldConfig.name}
-              validators={{
-                onChange: ({ value }) => fieldConfig.validator(value),
-              }}
+              validators={
+                fieldConfig.validator
+                  ? {
+                      onChange: ({ value }) => fieldConfig.validator!(value),
+                    }
+                  : undefined
+              }
             >
               {(field) => (
                 <div className="flex flex-col gap-2">
@@ -104,7 +152,9 @@ export default function ContactForm() {
                       className="text-base mb-1 gap-1"
                     >
                       {fieldConfig.label}
-                      <span className="text-red-500">*</span>
+                      {fieldConfig.required && (
+                        <span className="text-red-500">*</span>
+                      )}
                     </Label>
 
                     {fieldConfig.type === "textarea" ? (
@@ -143,6 +193,12 @@ export default function ContactForm() {
 
           <p className="text-sm text-red-500">* Thông tin bắt buộc</p>
 
+          {errorMessage && (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+              <p className="text-sm text-red-600">{errorMessage}</p>
+            </div>
+          )}
+
           <form.Subscribe
             selector={(state) => [state.canSubmit, state.isSubmitting]}
           >
@@ -159,6 +215,32 @@ export default function ContactForm() {
           </form.Subscribe>
         </div>
       </div>
+
+      <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
+        <DialogContent className="sm:max-w-md bg-white">
+          <DialogHeader>
+            <div className="flex flex-col items-center text-center space-y-4 py-4">
+              <div className="rounded-full bg-green-50 p-4">
+                <CheckCircle2 className="h-12 w-12 text-green-500" />
+              </div>
+              <DialogTitle className="text-2xl font-semibold text-[#05302C]">
+                Gửi thành công!
+              </DialogTitle>
+              <DialogDescription className="text-base text-[#666666] pt-2">
+                {successMessage || "Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất."}
+              </DialogDescription>
+            </div>
+          </DialogHeader>
+          <div className="flex justify-center pb-2">
+            <Button
+              onClick={() => setIsSuccessDialogOpen(false)}
+              className="bg-background-secondary hover:bg-background-secondary/80 text-foreground px-8 py-2"
+            >
+              Đóng
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
