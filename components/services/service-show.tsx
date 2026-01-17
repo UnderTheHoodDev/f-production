@@ -123,7 +123,7 @@ const ServiceShow = () => {
               />
               {/* Active line (primary) - fills gradually based on scroll */}
               <div
-                className="bg-primary absolute left-1/2 w-[1.5px] -translate-x-1/2"
+                className="bg-primary absolute left-1/2 w-[1.5px] -translate-x-1/2 lg:w-0.5"
                 style={{ height: `${lineHeight}px` }}
               />
 
