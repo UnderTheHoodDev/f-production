@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'motion/react';
+import Link from 'next/link';
 
 const HeroSection = () => {
   return (
@@ -32,7 +32,7 @@ const HeroSection = () => {
           >
             <Link
               href="/lien-he"
-              className="bg-background text-foreground rounded-4xl px-3 py-2 text-base/9 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg/8"
+              className="bg-background text-foreground rounded-4xl border-2 border-transparent px-3 py-2 text-base/8 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg"
             >
               Đặt lịch
             </Link>

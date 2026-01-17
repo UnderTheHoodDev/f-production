@@ -1,15 +1,15 @@
-import { Metadata } from "next";
-import NextTopLoader from "nextjs-toploader";
+import { Metadata } from 'next';
+import NextTopLoader from 'nextjs-toploader';
 
-import { montserrat } from "@/app/fonts";
-import Footer from "@/components/layout/footer";
-import NavBar from "@/components/layout/nav-bar";
+import { montserrat } from '@/app/fonts';
+import Footer from '@/components/layout/footer';
+import NavBar from '@/components/layout/nav-bar';
 
-import "./globals.css";
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "F Production",
-  description: "F.Production - Dịch vụ quay phim chụp ảnh chuyên nghiệp",
+  title: 'F Production',
+  description: 'F.Production - Dịch vụ quay phim chụp ảnh chuyên nghiệp',
 };
 
 export default function PublicLayout({
