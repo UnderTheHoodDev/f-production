@@ -121,6 +121,9 @@ export function ImageUploader({ folder = "fproduction-admin/images" }: ImageUplo
           multiple: true,
           tags: ["fproduction", "images"],
           resourceType: "image",
+          maxImageFileSize: 10000000,
+          maxImageWidth: 4500,
+          maxImageHeight: 3000,
         }}
         onUploadAdded={() => {
           setIsUploading(true);
