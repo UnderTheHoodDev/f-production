@@ -35,6 +35,7 @@ export async function POST(request: Request) {
         youtubeUrl,
         title: title && typeof title === "string" ? title : null,
         thumbnail: thumbnail && typeof thumbnail === "string" ? thumbnail : null,
+        showOnLanding: true,
       },
     });
 

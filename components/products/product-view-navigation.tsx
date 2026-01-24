@@ -34,7 +34,10 @@ const ProductViewNavigation = ({
           variant="ghost"
           size="icon"
           className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 text-white hover:bg-white/20"
-          onClick={onPrev}
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrev();
+          }}
         >
           <ChevronLeft className="h-8 w-8" />
         </Button>
@@ -45,7 +48,10 @@ const ProductViewNavigation = ({
           variant="ghost"
           size="icon"
           className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 text-white hover:bg-white/20"
-          onClick={onNext}
+          onClick={(e) => {
+            e.stopPropagation();
+            onNext();
+          }}
         >
           <ChevronRight className="h-8 w-8" />
         </Button>

@@ -51,12 +51,16 @@ const ServiceList = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:grid-cols-4 xl:gap-6 xl:max-w-[1280px]"
+        className="mx-auto flex flex-wrap justify-center gap-4 xl:gap-6 xl:max-w-[1280px]"
       >
         {services.map((service) => {
           const Icon = service.icon;
           return (
-            <Link key={service.slug} href={`/dich-vu/${service.slug}`}>
+            <Link
+              key={service.slug}
+              href={`/dich-vu/${service.slug}`}
+              className="w-full sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4.5rem)/4)]"
+            >
               <motion.div
                 variants={cardVariants as any}
                 whileHover={{

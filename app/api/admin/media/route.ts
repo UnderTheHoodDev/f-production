@@ -35,6 +35,7 @@ export async function POST(request: Request) {
         publicId,
         title: title && typeof title === "string" ? title : null,
         format: format && typeof format === "string" ? format : null,
+        showOnLanding: true,
       },
     });
 
