@@ -82,7 +82,7 @@ export async function DELETE(
 
     // Delete from S3
     try {
-      await deleteFromS3(image.s3Key);
+      await deleteFromS3(image.s3Key as string);
     } catch (s3Error) {
       console.error("[api/admin/media] S3 delete failed:", s3Error);
       // Continue to delete from DB even if S3 delete fails

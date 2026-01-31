@@ -73,7 +73,7 @@ export default async function ImagesPage({
   // Transform images to include computed url from s3Key
   const images = rawImages.map((image) => ({
     ...image,
-    url: getPublicUrl(image.s3Key),
+    url: getPublicUrl(image.s3Key as string),
   }));
 
   const pagination = {
@@ -135,7 +135,7 @@ export default async function ImagesPage({
               <ImageUploader />
             </div>
             <ImagesGallery
-              items={images}
+              items={images as any}
               pagination={pagination}
               currentSort={{ sortBy: finalSortBy, sortOrder: finalSortOrder }}
               filters={filters}

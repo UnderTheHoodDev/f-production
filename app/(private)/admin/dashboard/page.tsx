@@ -182,7 +182,7 @@ export default async function DashboardPage() {
                     className="group relative aspect-square overflow-hidden rounded-lg border bg-muted"
                   >
                     <Image
-                      src={getPublicUrl(image.s3Key)}
+                      src={getPublicUrl(image.s3Key as string)}
                       alt={image.title || "Studio image"}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 12.5vw"

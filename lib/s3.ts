@@ -105,7 +105,7 @@ export async function fileExistsInS3(s3Key: string): Promise<boolean> {
  * Get the public URL for an S3 object
  * Uses CloudFront if configured, otherwise falls back to S3 URL
  */
-export function getPublicUrl(s3Key: string): string {
+export function getPublicUrl(s3Key: string | null): string {
     if (CLOUDFRONT_DOMAIN) {
         // Remove trailing slash if present
         const domain = CLOUDFRONT_DOMAIN.replace(/\/$/, "");

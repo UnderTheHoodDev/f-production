@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
     Breadcrumb,
@@ -14,6 +15,15 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ContactsClient } from "@/components/contacts/contacts-client";
+import { Loader2 } from "lucide-react";
+
+function ContactsLoading() {
+    return (
+        <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+    );
+}
 
 export default function ContactsPage() {
     return (
@@ -49,7 +59,9 @@ export default function ContactsPage() {
                             Xem và quản lý các yêu cầu liên hệ từ khách hàng
                         </p>
                     </div>
-                    <ContactsClient />
+                    <Suspense fallback={<ContactsLoading />}>
+                        <ContactsClient />
+                    </Suspense>
                 </div>
             </SidebarInset>
         </SidebarProvider>
