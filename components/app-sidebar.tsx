@@ -53,7 +53,7 @@ const data = {
     },
     {
       title: "Liên hệ",
-      url: "#",
+      url: "/admin/contacts",
       icon: PhoneCall,
     },
   ],

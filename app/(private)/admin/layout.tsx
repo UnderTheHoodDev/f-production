@@ -6,7 +6,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="fproduction-theme">
+    <ThemeProvider defaultTheme="light" storageKey="admin-theme">
       {children}
     </ThemeProvider>
   );

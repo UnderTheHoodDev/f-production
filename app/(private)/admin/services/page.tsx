@@ -13,7 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { ThemeToggle } from "@/components/theme-toggle";
+
 import { prisma } from "@/lib/prisma";
 import { ServicesPageClient } from "@/components/services/services-page-client";
 
@@ -51,9 +51,6 @@ export default async function ServicesPage() {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-          </div>
-          <div className="px-4">
-            <ThemeToggle />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-6 p-4 pt-0">

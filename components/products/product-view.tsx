@@ -62,11 +62,10 @@ export function ProductView({
       />
 
       <div
-        className={`relative ${
-          product.type === "video"
+        className={`relative ${product.type === "video"
             ? "max-w-[90vw] max-h-[90vh] w-full aspect-video"
             : "max-h-[90vh] max-w-[90vw]"
-        }`}
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         {product.type === "image" ? (

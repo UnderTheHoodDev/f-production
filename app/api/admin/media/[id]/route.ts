@@ -1,14 +1,7 @@
 import { NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
 import { prisma } from "@/lib/prisma";
+import { deleteFromS3 } from "@/lib/s3";
 import { revalidatePath } from "next/cache";
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 export async function PATCH(
   request: Request,
@@ -39,8 +32,8 @@ export async function PATCH(
         showOnLanding: showOnLanding !== undefined ? showOnLanding : undefined,
         events: eventIds
           ? {
-              set: eventIds.map((eventId: string) => ({ id: eventId })),
-            }
+            set: eventIds.map((eventId: string) => ({ id: eventId })),
+          }
           : undefined,
       },
       include: {
@@ -87,16 +80,12 @@ export async function DELETE(
       );
     }
 
-    // Delete from Cloudinary if publicId exists
-    if (image.publicId) {
-      try {
-        await cloudinary.uploader.destroy(image.publicId, {
-          resource_type: "image",
-        });
-      } catch (cloudinaryError) {
-        console.error("[api/admin/media] Cloudinary delete failed", cloudinaryError);
-        // Continue to delete from DB even if Cloudinary delete fails
-      }
+    // Delete from S3
+    try {
+      await deleteFromS3(image.s3Key);
+    } catch (s3Error) {
+      console.error("[api/admin/media] S3 delete failed:", s3Error);
+      // Continue to delete from DB even if S3 delete fails
     }
 
     // Delete from database
@@ -117,4 +106,3 @@ export async function DELETE(
     );
   }
 }
-

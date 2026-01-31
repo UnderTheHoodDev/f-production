@@ -14,47 +14,65 @@ datasource db {
 }
 
 model Image {
-  id String @id @default(uuid())
-  title String?
-  format String?
-  url String?
-  publicId String?
-  showOnLanding Boolean @default(true)
-  events Event[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  title         String?
+  format        String?
+  s3Key         String   @unique
+  fileSize      Int?
+  width         Int?
+  height        Int?
+  showOnLanding Boolean  @default(true)
+  events        Event[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([s3Key])
 }
 
 model Video {
-  id String @id @default(uuid())
-  youtubeUrl String?
-  title String?
-  thumbnail String?
-  showOnLanding Boolean @default(true)
-  events Event[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  youtubeUrl    String?
+  title         String?
+  thumbnail     String?
+  showOnLanding Boolean  @default(true)
+  events        Event[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Event {
-  id String @id @default(uuid())
-  title String
-  place String?
-  client String?
+  id          String    @id @default(uuid())
+  title       String
+  place       String?
+  client      String?
   description String?
-  startDate DateTime?
-  endDate DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  images Image[]
-  videos Video[]
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  images      Image[]
+  videos      Video[]
 }
 
 model Service {
-  id String @id @default(uuid())
-  name String
+  id          String   @id @default(uuid())
+  name        String
   description String?
-  eventOrder String[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  eventOrder  String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Contact {
+  id          String   @id @default(uuid())
+  referenceId String   @unique
+  fullName    String
+  phone       String
+  address     String?
+  content     String?
+  status      String   @default("NEW") // NEW, CONTACTED, COMPLETED
+  note        String?
+  emailSent   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

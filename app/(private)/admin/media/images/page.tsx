@@ -17,11 +17,49 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { prisma } from "@/lib/prisma";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { getPublicUrl } from "@/lib/s3";
 
-export default async function ImagesPage() {
-  const images = await prisma.image.findMany({
-    orderBy: { createdAt: "desc" },
+
+const ITEMS_PER_PAGE = 24;
+
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+
+export default async function ImagesPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  const page = Math.max(1, parseInt((params.page as string) || "1", 10));
+  const sortBy = (params.sortBy as string) || "createdAt";
+  const sortOrder = (params.sortOrder as string) || "desc";
+  const search = (params.search as string) || "";
+
+  // Validate sort options
+  const validSortFields = ["createdAt", "updatedAt"];
+  const validSortOrders = ["asc", "desc"];
+  const finalSortBy = validSortFields.includes(sortBy) ? sortBy : "createdAt";
+  const finalSortOrder = validSortOrders.includes(sortOrder) ? sortOrder : "desc";
+
+  // Build where clause for search
+  const whereClause: {
+    title?: { contains: string; mode: "insensitive" };
+  } = {};
+
+  if (search.trim()) {
+    whereClause.title = { contains: search.trim(), mode: "insensitive" };
+  }
+
+  // Get total count with search
+  const total = await prisma.image.count({ where: whereClause });
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
+  // Get paginated images with search
+  const rawImages = await prisma.image.findMany({
+    where: whereClause,
+    orderBy: { [finalSortBy]: finalSortOrder as "asc" | "desc" },
+    skip: (page - 1) * ITEMS_PER_PAGE,
+    take: ITEMS_PER_PAGE,
     include: {
       events: {
         select: {
@@ -31,6 +69,25 @@ export default async function ImagesPage() {
       },
     },
   });
+
+  // Transform images to include computed url from s3Key
+  const images = rawImages.map((image) => ({
+    ...image,
+    url: getPublicUrl(image.s3Key),
+  }));
+
+  const pagination = {
+    page,
+    limit: ITEMS_PER_PAGE,
+    total,
+    totalPages,
+    hasMore: page < totalPages,
+    hasPrev: page > 1,
+  };
+
+  const filters = {
+    search,
+  };
 
   return (
     <SidebarProvider>
@@ -59,9 +116,6 @@ export default async function ImagesPage() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <div className="flex items-center gap-2 px-4">
-            <ThemeToggle />
-          </div>
         </header>
         <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
           <div>
@@ -80,11 +134,15 @@ export default async function ImagesPage() {
               </div>
               <ImageUploader />
             </div>
-            <ImagesGallery items={images} />
+            <ImagesGallery
+              items={images}
+              pagination={pagination}
+              currentSort={{ sortBy: finalSortBy, sortOrder: finalSortOrder }}
+              filters={filters}
+            />
           </div>
         </div>
       </SidebarInset>
     </SidebarProvider>
   );
 }
-

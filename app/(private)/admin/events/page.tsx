@@ -19,7 +19,7 @@ import { prisma } from "@/lib/prisma"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { EventsPageClient } from "@/components/events/events-page-client"
-import { ThemeToggle } from "@/components/theme-toggle"
+
 
 export default async function EventsPage() {
   const events = await prisma.event.findMany({
@@ -50,9 +50,6 @@ export default async function EventsPage() {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-          </div>
-          <div className="flex items-center gap-2 px-4">
-            <ThemeToggle />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

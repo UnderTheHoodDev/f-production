@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CldImage } from "next-cloudinary";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -9,8 +9,8 @@ type ImageItem = {
   id: string;
   title: string | null;
   format: string | null;
-  url: string | null;
-  publicId: string | null;
+  url: string;
+  s3Key: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -122,19 +122,16 @@ export function ImageViewer({ images, initialIndex, onClose }: ImageViewerProps)
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-white/20 border-t-white" />
           </div>
         )}
-        
+
         <div className={isLoading ? "opacity-0" : "opacity-100 transition-opacity duration-300"}>
-          <CldImage
+          <img
             key={imageKey}
-            width={1200}
-            height={900}
-            src={currentImage.publicId || (currentImage.url as string)}
+            src={currentImage.url}
             alt={currentImage.title || "Studio image"}
             className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
             onLoad={handleImageLoad}
-            onLoadingComplete={handleImageLoad}
           />
-        
+
           {/* Image Title */}
           {currentImage.title && (
             <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white px-4 py-2 rounded-b-lg">
@@ -154,4 +151,3 @@ export function ImageViewer({ images, initialIndex, onClose }: ImageViewerProps)
     </div>
   );
 }
-

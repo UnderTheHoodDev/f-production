@@ -1,6 +1,5 @@
 import { Play } from 'lucide-react';
 import Image from 'next/image';
-import { CldImage } from 'next-cloudinary';
 
 export type ProductImage = {
   id: string;
@@ -27,7 +26,6 @@ const ProductItem = ({
   eventClient,
   thumbnail,
 }: ProductItemProps) => {
-  const hasCloudinaryImage = image?.publicId;
   const imageUrl = image?.url || thumbnail;
 
   return (
@@ -43,25 +41,15 @@ const ProductItem = ({
           alt="Logo copyright"
           className="absolute top-1 left-2 opacity-40 z-10"
         />
-        {hasCloudinaryImage ? (
-          <CldImage
-            src={image.publicId!}
-            width={480}
-            height={270}
-            alt={image.title || eventName || 'Product image'}
-            className="aspect-video max-h-60 w-full object-cover"
-          />
-        ) : (
-          <Image
-            src={imageUrl || 'https://img.youtube.com/vi/LIKOvbJ-DZg/maxresdefault.jpg'}
-            width={480}
-            height={270}
-            loading="lazy"
-            unoptimized={!!imageUrl}
-            className="aspect-video max-h-60 w-full object-cover"
-            alt={image?.title || eventName || 'Product image'}
-          />
-        )}
+        <Image
+          src={imageUrl || 'https://img.youtube.com/vi/LIKOvbJ-DZg/maxresdefault.jpg'}
+          width={480}
+          height={270}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
+          loading="lazy"
+          className="aspect-video max-h-60 w-full object-cover"
+          alt={image?.title || eventName || 'Product image'}
+        />
         {type === 'video' && (
           <div className="border-foreground absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 p-2">
             <Play className="text-foreground fill-foreground h-5 w-5" />

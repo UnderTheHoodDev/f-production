@@ -367,7 +367,7 @@ export default function ContactForm() {
 
       {/* Success Dialog */}
       <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-white border-gray-200">
           <DialogHeader>
             <div className="flex flex-col items-center space-y-4 py-4 text-center">
               <motion.div

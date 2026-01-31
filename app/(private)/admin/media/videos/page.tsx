@@ -17,7 +17,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { prisma } from "@/lib/prisma";
-import { ThemeToggle } from "@/components/theme-toggle";
+
 
 export default async function VideosPage() {
   const videos = await prisma.video.findMany({
@@ -58,9 +58,6 @@ export default async function VideosPage() {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-          </div>
-          <div className="flex items-center gap-2 px-4">
-            <ThemeToggle />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-6 p-4 pt-0">

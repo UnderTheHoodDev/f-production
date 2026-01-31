@@ -16,7 +16,7 @@ type ThemeProviderState = {
 }
 
 const initialState: ThemeProviderState = {
-  theme: "dark",
+  theme: "light",
   setTheme: () => null,
 }
 
@@ -28,28 +28,34 @@ export function ThemeProvider({
   storageKey = "fproduction-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = React.useState<Theme>(
-    () => (typeof window !== "undefined" && (localStorage.getItem(storageKey) as Theme)) || defaultTheme
-  )
+  const [theme, setTheme] = React.useState<Theme>(defaultTheme)
+  const [mounted, setMounted] = React.useState(false)
+
+  // Load theme from localStorage after mount (client-side only)
+  React.useEffect(() => {
+    const stored = localStorage.getItem(storageKey) as Theme | null
+    if (stored && (stored === "light" || stored === "dark")) {
+      setTheme(stored)
+    }
+    setMounted(true)
+  }, [storageKey])
 
   React.useEffect(() => {
+    if (!mounted) return
+
     const root = window.document.documentElement
     const path = window.location.pathname
-    
+
     // Chỉ thay đổi theme khi ở trang admin (không phải login)
     if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
       // Remove both theme classes first
       root.classList.remove("light", "dark")
       // Add the current theme class
-      if (theme) {
-        root.classList.add(theme)
-      }
+      root.classList.add(theme)
       // Save to localStorage
-      if (typeof window !== "undefined") {
-        localStorage.setItem(storageKey, theme)
-      }
+      localStorage.setItem(storageKey, theme)
     }
-  }, [theme, storageKey])
+  }, [theme, storageKey, mounted])
 
   const value = {
     theme,

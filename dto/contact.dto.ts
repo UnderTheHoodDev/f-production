@@ -1,9 +1,8 @@
 export type ContactRequestDto = {
-  name: string;
-  email: string;
-  service: string;
-  budget?: string;
-  message?: string;
+  fullName: string;
+  phone: string;
+  address?: string;
+  content?: string;
 };
 
 export type ContactResponseDto = {
@@ -11,4 +10,3 @@ export type ContactResponseDto = {
   message: string;
   referenceId: string;
 };
-

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getPublicUrl } from "@/lib/s3";
 
 // Mapping từ filter type (frontend) sang service name (database)
 // Có thể mở rộng sau này
@@ -21,8 +22,8 @@ export async function GET(request: Request) {
 
     if (!targetServiceName) {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           message: "Cần cung cấp filterType hoặc serviceName",
           availableFilters: Object.keys(FILTER_SERVICE_MAP)
         },
@@ -85,8 +86,8 @@ export async function GET(request: Request) {
         id: image.id,
         title: image.title,
         format: image.format,
-        url: image.url,
-        publicId: image.publicId,
+        url: getPublicUrl(image.s3Key),
+        s3Key: image.s3Key,
         createdAt: image.createdAt,
         updatedAt: image.updatedAt,
         type: "image" as const,
