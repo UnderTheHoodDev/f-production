@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MoreVertical, Play, CheckSquare, Square, Trash2, Calendar, Eye, EyeOff } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,6 +19,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { VideoViewer } from "@/components/media/video-viewer";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { VideoEditDialog } from "@/components/media/video-edit-dialog";
@@ -49,7 +54,7 @@ type SortOption = "createdAt-desc" | "createdAt-asc" | "updatedAt-desc" | "updat
 // Extract YouTube video ID from URL
 function getYouTubeVideoId(url: string | null): string | null {
   if (!url) return null;
-  
+
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
   return match && match[2].length === 11 ? match[2] : null;
@@ -82,25 +87,27 @@ export function VideosGallery({ items }: VideosGalleryProps) {
   const [isUpdatingEvents, setIsUpdatingEvents] = useState(false);
   const [showLandingSelector, setShowLandingSelector] = useState(false);
   const [isUpdatingLanding, setIsUpdatingLanding] = useState(false);
+  // Track last clicked index for Shift+Click range selection
+  const lastClickedIndexRef = useRef<number | null>(null);
 
   const sortedItems = useMemo(() => {
     const sorted = [...items];
-    
+
     switch (sortBy) {
       case "createdAt-desc":
-        return sorted.sort((a, b) => 
+        return sorted.sort((a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
       case "createdAt-asc":
-        return sorted.sort((a, b) => 
+        return sorted.sort((a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
       case "updatedAt-desc":
-        return sorted.sort((a, b) => 
+        return sorted.sort((a, b) =>
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
         );
       case "updatedAt-asc":
-        return sorted.sort((a, b) => 
+        return sorted.sort((a, b) =>
           new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
         );
       default:
@@ -141,16 +148,32 @@ export function VideosGallery({ items }: VideosGalleryProps) {
     }
   };
 
-  const handleToggleSelect = (videoId: string) => {
-    setSelectedIds((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(videoId)) {
-        newSet.delete(videoId);
-      } else {
-        newSet.add(videoId);
-      }
-      return newSet;
-    });
+  const handleToggleSelect = (videoId: string, index: number, event?: React.MouseEvent) => {
+    // Handle Shift+Click for range selection
+    if (event?.shiftKey && lastClickedIndexRef.current !== null) {
+      const start = Math.min(lastClickedIndexRef.current, index);
+      const end = Math.max(lastClickedIndexRef.current, index);
+      const rangeIds = sortedItems.slice(start, end + 1).map((item) => item.id);
+
+      setSelectedIds((prev) => {
+        const newSet = new Set(prev);
+        rangeIds.forEach((id) => newSet.add(id));
+        return newSet;
+      });
+    } else {
+      // Normal toggle
+      setSelectedIds((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(videoId)) {
+          newSet.delete(videoId);
+        } else {
+          newSet.add(videoId);
+        }
+        return newSet;
+      });
+    }
+    // Update last clicked index
+    lastClickedIndexRef.current = index;
   };
 
   const handleSelectAll = () => {
@@ -178,7 +201,7 @@ export function VideosGallery({ items }: VideosGalleryProps) {
       );
 
       const responses = await Promise.all(deletePromises);
-      
+
       for (const response of responses) {
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));
@@ -221,7 +244,7 @@ export function VideosGallery({ items }: VideosGalleryProps) {
     try {
       setIsUpdatingLanding(true);
       const videoIds = Array.from(selectedIds);
-      
+
       const updatePromises = videoIds.map((videoId) =>
         fetch(`/api/admin/videos/${videoId}`, {
           method: "PATCH",
@@ -235,7 +258,7 @@ export function VideosGallery({ items }: VideosGalleryProps) {
       );
 
       const responses = await Promise.all(updatePromises);
-      
+
       for (const response of responses) {
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));
@@ -260,7 +283,7 @@ export function VideosGallery({ items }: VideosGalleryProps) {
     try {
       setIsUpdatingEvents(true);
       const videoIds = Array.from(selectedIds);
-      
+
       const updatePromises = videoIds.map((videoId) =>
         fetch(`/api/admin/videos/${videoId}`, {
           method: "PATCH",
@@ -274,7 +297,7 @@ export function VideosGallery({ items }: VideosGalleryProps) {
       );
 
       const responses = await Promise.all(updatePromises);
-      
+
       for (const response of responses) {
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));
@@ -345,7 +368,7 @@ export function VideosGallery({ items }: VideosGalleryProps) {
         </Select>
       </div>
       <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-        {sortedItems.map((item) => {
+        {sortedItems.map((item, index) => {
           const videoId = getYouTubeVideoId(item.youtubeUrl);
           const thumbnailUrl = item.thumbnail || getYouTubeThumbnail(videoId);
           const isSelected = selectedIds.has(item.id);
@@ -353,18 +376,19 @@ export function VideosGallery({ items }: VideosGalleryProps) {
           return (
             <figure
               key={item.id}
-              className={`group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md ${
-                isSelected 
-                  ? "border-[#d9b588] ring-2 ring-[#d9b588]/30" 
-                  : "border-border"
-              }`}
+              className={`group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md ${isSelected
+                ? "border-[#d9b588] ring-2 ring-[#d9b588]/30"
+                : "border-border"
+                }`}
             >
               {item.title && (
                 <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 dark:bg-muted/20">
                   <Checkbox
                     checked={selectedIds.has(item.id)}
-                    onCheckedChange={() => handleToggleSelect(item.id)}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleSelect(item.id, index, e);
+                    }}
                     className="shrink-0"
                   />
                   <p className="text-xs font-medium text-foreground line-clamp-1 flex-1">
@@ -407,8 +431,10 @@ export function VideosGallery({ items }: VideosGalleryProps) {
                 <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                   <Checkbox
                     checked={selectedIds.has(item.id)}
-                    onCheckedChange={() => handleToggleSelect(item.id)}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleSelect(item.id, index, e);
+                    }}
                     className="bg-background/80 backdrop-blur-sm"
                   />
                   <DropdownMenu>
@@ -444,7 +470,7 @@ export function VideosGallery({ items }: VideosGalleryProps) {
                   </DropdownMenu>
                 </div>
               )}
-              <div 
+              <div
                 className="relative aspect-4/3 overflow-hidden bg-muted/30 dark:bg-muted/20 p-2 cursor-pointer"
                 onClick={() => {
                   const index = sortedItems.findIndex((vid) => vid.id === item.id);
@@ -498,63 +524,73 @@ export function VideosGallery({ items }: VideosGalleryProps) {
 
       {/* Action Bar - Hiển thị khi có items được chọn */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-fit px-4">
-          <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-background/95 backdrop-blur-sm shadow-lg px-3 py-2">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-primary bg-primary/10 px-2.5 py-1 rounded-md whitespace-nowrap">
-                {selectedIds.size} đã chọn
-              </span>
-              <Separator orientation="vertical" className="h-5!" />
-              <div className="flex items-center gap-1">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-fit max-w-[95vw] px-2 sm:px-4">
+          <div className="flex items-center gap-1 sm:gap-2 rounded-lg border border-border bg-background/95 backdrop-blur-sm shadow-lg px-2 sm:px-3 py-2">
+            {/* Selection count */}
+            <span className="text-sm font-medium text-primary bg-primary/10 px-2 sm:px-2.5 py-1 rounded-md whitespace-nowrap">
+              {selectedIds.size}
+            </span>
+
+            <Separator orientation="vertical" className="h-5! hidden sm:block" />
+
+            {/* Select/Deselect buttons - icon only on mobile */}
+            <div className="flex items-center gap-0.5 sm:gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSelectAll}
+                className="h-8 px-2 sm:gap-1.5"
+                title="Chọn tất cả"
+              >
+                <CheckSquare className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">Chọn tất cả</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDeselectAll}
+                className="h-8 px-2 sm:gap-1.5"
+                title="Bỏ chọn"
+              >
+                <Square className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">Bỏ chọn</span>
+              </Button>
+            </div>
+
+            <Separator orientation="vertical" className="h-5!" />
+
+            {/* Event Selector - Popover */}
+            <Popover open={showEventSelector} onOpenChange={setShowEventSelector}>
+              <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={handleSelectAll}
-                  className="h-8 text-sm gap-1.5 px-2"
+                  onClick={handleOpenEventSelector}
+                  className="h-8 px-2 sm:gap-1.5"
+                  title="Chọn sự kiện"
                 >
-                  <CheckSquare className="h-4 w-4" />
-                  Chọn tất cả
+                  <Calendar className="h-4 w-4" />
+                  <span className="hidden sm:inline text-sm">Sự kiện</span>
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleDeselectAll}
-                  className="h-8 text-sm gap-1.5 px-2"
-                >
-                  <Square className="h-4 w-4" />
-                  Bỏ chọn tất cả
-                </Button>
-              </div>
-              {showEventSelector && (
-                <>
-                  <Separator orientation="vertical" className="h-5!" />
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-[180px]">
-                      {isLoadingEvents ? (
-                        <div className="text-xs text-muted-foreground px-2">Đang tải...</div>
-                      ) : (
-                        <MultiSelect
-                          options={events.map((event) => ({
-                            value: event.id,
-                            label: event.title,
-                          }))}
-                          selected={selectedEventIds}
-                          onSelectedChange={setSelectedEventIds}
-                          placeholder="Chọn sự kiện..."
-                          className="h-8"
-                          position="top"
-                        />
-                      )}
-                    </div>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={handleUpdateEventsBulk}
-                      className="h-8 text-sm gap-1.5 px-2"
-                      disabled={isUpdatingEvents || selectedEventIds.length === 0}
-                    >
-                      {isUpdatingEvents ? "Đang cập nhật..." : "Xác nhận"}
-                    </Button>
+              </PopoverTrigger>
+              <PopoverContent side="top" align="center" className="w-72 p-3">
+                <div className="space-y-3">
+                  <p className="text-sm font-medium">Chọn sự kiện để thêm</p>
+                  {isLoadingEvents ? (
+                    <div className="text-xs text-muted-foreground">Đang tải...</div>
+                  ) : (
+                    <MultiSelect
+                      options={events.map((event) => ({
+                        value: event.id,
+                        label: event.title,
+                      }))}
+                      selected={selectedEventIds}
+                      onSelectedChange={setSelectedEventIds}
+                      placeholder="Chọn sự kiện..."
+                      className="w-full"
+                    />
+                  )}
+                  <div className="flex gap-2 justify-end">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -562,83 +598,61 @@ export function VideosGallery({ items }: VideosGalleryProps) {
                         setShowEventSelector(false);
                         setSelectedEventIds([]);
                       }}
-                      className="h-8 text-sm px-2"
                     >
                       Hủy
                     </Button>
-                  </div>
-                </>
-              )}
-              {!showEventSelector && !showLandingSelector && (
-                <>
-                  <Separator orientation="vertical" className="h-5!" />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleOpenEventSelector}
-                    className="h-8 text-sm gap-1.5 px-2"
-                    disabled={isLoadingEvents}
-                  >
-                    <Calendar className="h-4 w-4" />
-                    Chọn sự kiện
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowLandingSelector(true)}
-                    className="h-8 text-sm gap-1.5 px-2"
-                  >
-                    <Eye className="h-4 w-4" />
-                    Hiển thị trang chủ
-                  </Button>
-                </>
-              )}
-              {showLandingSelector && (
-                <>
-                  <Separator orientation="vertical" className="h-5!" />
-                  <div className="flex items-center gap-1.5">
                     <Button
-                      variant="default"
                       size="sm"
-                      onClick={() => handleUpdateLandingBulk(true)}
-                      className="h-8 text-sm gap-1.5 px-2"
-                      disabled={isUpdatingLanding}
+                      onClick={() => {
+                        handleUpdateEventsBulk();
+                        setShowEventSelector(false);
+                      }}
+                      disabled={isUpdatingEvents || selectedEventIds.length === 0}
                     >
-                      <Eye className="h-4 w-4" />
-                      {isUpdatingLanding ? "Đang cập nhật..." : "Hiển thị"}
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleUpdateLandingBulk(false)}
-                      className="h-8 text-sm gap-1.5 px-2"
-                      disabled={isUpdatingLanding}
-                    >
-                      <EyeOff className="h-4 w-4" />
-                      {isUpdatingLanding ? "Đang cập nhật..." : "Ẩn"}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowLandingSelector(false)}
-                      className="h-8 text-sm px-2"
-                    >
-                      Hủy
+                      {isUpdatingEvents ? "Đang lưu..." : "Lưu"}
                     </Button>
                   </div>
-                </>
-              )}
-            </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Direct Show/Hide buttons */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleUpdateLandingBulk(true)}
+              className="h-8 px-2 sm:gap-1.5 text-green-600 hover:text-green-700 hover:bg-green-50"
+              disabled={isUpdatingLanding}
+              title="Hiển thị trên trang chủ"
+            >
+              <Eye className="h-4 w-4" />
+              <span className="hidden lg:inline text-sm">Hiện</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleUpdateLandingBulk(false)}
+              className="h-8 px-2 sm:gap-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              disabled={isUpdatingLanding}
+              title="Ẩn khỏi trang chủ"
+            >
+              <EyeOff className="h-4 w-4" />
+              <span className="hidden lg:inline text-sm">Ẩn</span>
+            </Button>
+
             <Separator orientation="vertical" className="h-5!" />
+
+            {/* Delete button */}
             <Button
               variant="destructive"
               size="sm"
               onClick={handleDeleteMultiple}
-              className="h-8 text-sm gap-1.5 px-2 dark:bg-red-500/80 dark:text-white dark:hover:bg-red-500 dark:border-red-500/50"
+              className="h-8 px-2 sm:gap-1.5 sm:px-3"
               disabled={isDeletingMultiple}
+              title="Xóa"
             >
               <Trash2 className="h-4 w-4" />
-              {isDeletingMultiple ? "Đang xóa..." : "Xóa"}
+              <span className="hidden sm:inline text-sm">{isDeletingMultiple ? "Đang xóa..." : "Xóa"}</span>
             </Button>
           </div>
         </div>

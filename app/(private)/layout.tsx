@@ -30,15 +30,16 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  // Chỉ set theme cho trang admin
                   const path = window.location.pathname;
+                  // Trang admin (không phải login) dùng light theme
                   if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
-                    const theme = localStorage.getItem('fproduction-theme') || 'dark';
+                    const theme = localStorage.getItem('admin-theme') || 'light';
+                    document.documentElement.classList.remove('dark', 'light');
                     document.documentElement.classList.add(theme);
                   } else {
-                    // Trang login và root luôn dùng dark theme
-                    document.documentElement.classList.add('dark');
+                    // Trang login giữ dark theme
                     document.documentElement.classList.remove('light');
+                    document.documentElement.classList.add('dark');
                   }
                 } catch (e) {}
               })();

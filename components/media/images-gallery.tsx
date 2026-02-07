@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Image from "next/image";
 import { MoreVertical, CheckSquare, Square, Trash2, Calendar, Eye, EyeOff, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
@@ -20,6 +20,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { ImageViewer } from "@/components/media/image-viewer";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { ImageEditDialog } from "@/components/media/image-edit-dialog";
@@ -96,6 +101,8 @@ export function ImagesGallery({ items, pagination, currentSort, filters }: Image
   const [isUpdatingEvents, setIsUpdatingEvents] = useState(false);
   const [showLandingSelector, setShowLandingSelector] = useState(false);
   const [isUpdatingLanding, setIsUpdatingLanding] = useState(false);
+  // Track last clicked index for Shift+Click range selection
+  const lastClickedIndexRef = useRef<number | null>(null);
 
   // Create URL with updated params
   const createPageUrl = useCallback((newPage: number) => {
@@ -179,16 +186,32 @@ export function ImagesGallery({ items, pagination, currentSort, filters }: Image
     router.refresh();
   };
 
-  const handleToggleSelect = (imageId: string) => {
-    setSelectedIds((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(imageId)) {
-        newSet.delete(imageId);
-      } else {
-        newSet.add(imageId);
-      }
-      return newSet;
-    });
+  const handleToggleSelect = (imageId: string, index: number, event?: React.MouseEvent) => {
+    // Handle Shift+Click for range selection
+    if (event?.shiftKey && lastClickedIndexRef.current !== null) {
+      const start = Math.min(lastClickedIndexRef.current, index);
+      const end = Math.max(lastClickedIndexRef.current, index);
+      const rangeIds = items.slice(start, end + 1).map((item: ImageItem) => item.id);
+
+      setSelectedIds((prev) => {
+        const newSet = new Set(prev);
+        rangeIds.forEach((id) => newSet.add(id));
+        return newSet;
+      });
+    } else {
+      // Normal toggle
+      setSelectedIds((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(imageId)) {
+          newSet.delete(imageId);
+        } else {
+          newSet.add(imageId);
+        }
+        return newSet;
+      });
+    }
+    // Update last clicked index
+    lastClickedIndexRef.current = index;
   };
 
   const handleSelectAll = () => {
@@ -432,7 +455,7 @@ export function ImagesGallery({ items, pagination, currentSort, filters }: Image
       {/* Search and Filter Toolbar */}
       {renderToolbar()}
       <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-        {items.map((item: ImageItem) => {
+        {items.map((item: ImageItem, index: number) => {
           const isSelected = selectedIds.has(item.id);
           return (
             <figure
@@ -446,8 +469,10 @@ export function ImagesGallery({ items, pagination, currentSort, filters }: Image
                 <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 dark:bg-muted/20">
                   <Checkbox
                     checked={selectedIds.has(item.id)}
-                    onCheckedChange={() => handleToggleSelect(item.id)}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleSelect(item.id, index, e);
+                    }}
                     className="shrink-0"
                   />
                   <p className="text-xs font-medium text-foreground line-clamp-1 flex-1">
@@ -491,8 +516,10 @@ export function ImagesGallery({ items, pagination, currentSort, filters }: Image
                 <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                   <Checkbox
                     checked={selectedIds.has(item.id)}
-                    onCheckedChange={() => handleToggleSelect(item.id)}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleSelect(item.id, index, e);
+                    }}
                     className="bg-background/80 backdrop-blur-sm"
                   />
                   <DropdownMenu>
@@ -627,63 +654,73 @@ export function ImagesGallery({ items, pagination, currentSort, filters }: Image
 
       {/* Action Bar - Hiển thị khi có items được chọn */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-fit px-4">
-          <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-background/95 backdrop-blur-sm shadow-lg px-3 py-2">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-primary bg-primary/10 px-2.5 py-1 rounded-md whitespace-nowrap">
-                {selectedIds.size} đã chọn
-              </span>
-              <Separator orientation="vertical" className="h-5!" />
-              <div className="flex items-center gap-1">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-fit max-w-[95vw] px-2 sm:px-4">
+          <div className="flex items-center gap-1 sm:gap-2 rounded-lg border border-border bg-background/95 backdrop-blur-sm shadow-lg px-2 sm:px-3 py-2">
+            {/* Selection count */}
+            <span className="text-sm font-medium text-primary bg-primary/10 px-2 sm:px-2.5 py-1 rounded-md whitespace-nowrap">
+              {selectedIds.size}
+            </span>
+
+            <Separator orientation="vertical" className="h-5! hidden sm:block" />
+
+            {/* Select/Deselect buttons - icon only on mobile */}
+            <div className="flex items-center gap-0.5 sm:gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSelectAll}
+                className="h-8 px-2 sm:gap-1.5"
+                title="Chọn tất cả"
+              >
+                <CheckSquare className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">Chọn tất cả</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDeselectAll}
+                className="h-8 px-2 sm:gap-1.5"
+                title="Bỏ chọn"
+              >
+                <Square className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">Bỏ chọn</span>
+              </Button>
+            </div>
+
+            <Separator orientation="vertical" className="h-5!" />
+
+            {/* Event Selector - Popover */}
+            <Popover open={showEventSelector} onOpenChange={setShowEventSelector}>
+              <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={handleSelectAll}
-                  className="h-8 text-sm gap-1.5 px-2"
+                  onClick={handleOpenEventSelector}
+                  className="h-8 px-2 sm:gap-1.5"
+                  title="Chọn sự kiện"
                 >
-                  <CheckSquare className="h-4 w-4" />
-                  Chọn tất cả
+                  <Calendar className="h-4 w-4" />
+                  <span className="hidden sm:inline text-sm">Sự kiện</span>
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleDeselectAll}
-                  className="h-8 text-sm gap-1.5 px-2"
-                >
-                  <Square className="h-4 w-4" />
-                  Bỏ chọn tất cả
-                </Button>
-              </div>
-              {showEventSelector && (
-                <>
-                  <Separator orientation="vertical" className="h-5!" />
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-[180px]">
-                      {isLoadingEvents ? (
-                        <div className="text-xs text-muted-foreground px-2">Đang tải...</div>
-                      ) : (
-                        <MultiSelect
-                          options={events.map((event) => ({
-                            value: event.id,
-                            label: event.title,
-                          }))}
-                          selected={selectedEventIds}
-                          onSelectedChange={setSelectedEventIds}
-                          placeholder="Chọn sự kiện..."
-                          className="h-8"
-                          position="top"
-                        />
-                      )}
-                    </div>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={handleUpdateEventsBulk}
-                      className="h-8 text-sm gap-1.5 px-2"
-                      disabled={isUpdatingEvents || selectedEventIds.length === 0}
-                    >
-                      {isUpdatingEvents ? "Đang cập nhật..." : "Xác nhận"}
-                    </Button>
+              </PopoverTrigger>
+              <PopoverContent side="top" align="center" className="w-72 p-3">
+                <div className="space-y-3">
+                  <p className="text-sm font-medium">Chọn sự kiện để thêm</p>
+                  {isLoadingEvents ? (
+                    <div className="text-xs text-muted-foreground">Đang tải...</div>
+                  ) : (
+                    <MultiSelect
+                      options={events.map((event) => ({
+                        value: event.id,
+                        label: event.title,
+                      }))}
+                      selected={selectedEventIds}
+                      onSelectedChange={setSelectedEventIds}
+                      placeholder="Chọn sự kiện..."
+                      className="w-full"
+                    />
+                  )}
+                  <div className="flex gap-2 justify-end">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -691,82 +728,61 @@ export function ImagesGallery({ items, pagination, currentSort, filters }: Image
                         setShowEventSelector(false);
                         setSelectedEventIds([]);
                       }}
-                      className="h-8 text-sm px-2"
                     >
                       Hủy
                     </Button>
-                  </div>
-                </>
-              )}
-              {!showEventSelector && !showLandingSelector && (
-                <>
-                  <Separator orientation="vertical" className="h-5!" />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleOpenEventSelector}
-                    className="h-8 text-sm gap-1.5 px-2"
-                  >
-                    <Calendar className="h-4 w-4" />
-                    Chọn sự kiện
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowLandingSelector(true)}
-                    className="h-8 text-sm gap-1.5 px-2"
-                  >
-                    <Eye className="h-4 w-4" />
-                    Hiển thị trang chủ
-                  </Button>
-                </>
-              )}
-              {showLandingSelector && (
-                <>
-                  <Separator orientation="vertical" className="h-5!" />
-                  <div className="flex items-center gap-1.5">
                     <Button
-                      variant="default"
                       size="sm"
-                      onClick={() => handleUpdateLandingBulk(true)}
-                      className="h-8 text-sm gap-1.5 px-2"
-                      disabled={isUpdatingLanding}
+                      onClick={() => {
+                        handleUpdateEventsBulk();
+                        setShowEventSelector(false);
+                      }}
+                      disabled={isUpdatingEvents || selectedEventIds.length === 0}
                     >
-                      <Eye className="h-4 w-4" />
-                      {isUpdatingLanding ? "Đang cập nhật..." : "Hiển thị"}
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleUpdateLandingBulk(false)}
-                      className="h-8 text-sm gap-1.5 px-2"
-                      disabled={isUpdatingLanding}
-                    >
-                      <EyeOff className="h-4 w-4" />
-                      {isUpdatingLanding ? "Đang cập nhật..." : "Ẩn"}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowLandingSelector(false)}
-                      className="h-8 text-sm px-2"
-                    >
-                      Hủy
+                      {isUpdatingEvents ? "Đang lưu..." : "Lưu"}
                     </Button>
                   </div>
-                </>
-              )}
-            </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Direct Show/Hide buttons */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleUpdateLandingBulk(true)}
+              className="h-8 px-2 sm:gap-1.5 text-green-600 hover:text-green-700 hover:bg-green-50"
+              disabled={isUpdatingLanding}
+              title="Hiển thị trên trang chủ"
+            >
+              <Eye className="h-4 w-4" />
+              <span className="hidden lg:inline text-sm">Hiện</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleUpdateLandingBulk(false)}
+              className="h-8 px-2 sm:gap-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              disabled={isUpdatingLanding}
+              title="Ẩn khỏi trang chủ"
+            >
+              <EyeOff className="h-4 w-4" />
+              <span className="hidden lg:inline text-sm">Ẩn</span>
+            </Button>
+
             <Separator orientation="vertical" className="h-5!" />
+
+            {/* Delete button */}
             <Button
               variant="destructive"
               size="sm"
               onClick={handleDeleteMultiple}
-              className="h-8 text-sm gap-1.5 px-2 dark:bg-red-500/80 dark:text-white dark:hover:bg-red-500 dark:border-red-500/50"
+              className="h-8 px-2 sm:gap-1.5 sm:px-3"
               disabled={isDeletingMultiple}
+              title="Xóa"
             >
               <Trash2 className="h-4 w-4" />
-              {isDeletingMultiple ? "Đang xóa..." : "Xóa"}
+              <span className="hidden sm:inline text-sm">{isDeletingMultiple ? "Đang xóa..." : "Xóa"}</span>
             </Button>
           </div>
         </div>
