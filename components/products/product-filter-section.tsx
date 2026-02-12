@@ -11,11 +11,15 @@ const ProductFilterSection = ({
   selectedFilter,
 }: FilterSectionProps) => {
   const filterTypes = [
+    'Livestream',
+    'Ảnh sự kiện',
+    'Video sự kiện',
     'TVC',
-    'GIỚI THIỆU',
-    'ẢNH EVENT',
-    'PHIM NGẮN',
-    'MV CA NHẠC',
+    'Ảnh Profile',
+    'Podcast',
+    'Ảnh Kiến trúc',
+    'Video Kiến trúc',
+    'Đăng Báo chí',
   ];
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -62,7 +66,7 @@ const ProductFilterSection = ({
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-wrap justify-center gap-2 md:gap-4 lg:gap-8"
+      className="relative mx-auto flex w-full max-w-[980px] flex-wrap justify-center gap-2 md:gap-3 lg:gap-4"
     >
       <div
         className="bg-background-secondary absolute top-0 left-0 rounded-4xl transition-all duration-300 ease-out"
@@ -82,7 +86,7 @@ const ProductFilterSection = ({
           onMouseEnter={() => handleMouseEnter(index)}
           onMouseLeave={handleMouseLeave}
           className={clsx(
-            'relative z-10 cursor-pointer rounded-4xl px-4 py-2 font-medium transition-colors duration-300 sm:text-base md:px-5 md:py-3 lg:text-lg',
+            'relative z-10 min-w-[140px] cursor-pointer rounded-4xl px-4 py-2 text-center font-medium uppercase tracking-wide transition-colors duration-300 sm:text-base md:min-w-[150px] md:px-5 md:py-3 lg:text-lg',
             activeIndex === index ? 'text-foreground' : 'text-[#1B1B1B]'
           )}
         >

@@ -18,12 +18,16 @@ const HeroSection = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4, ease: 'easeOut' }}
           >
-            <Link
-              href="/dich-vu"
-              className="text-foreground border-foreground rounded-4xl border-2 px-3 py-2 text-base/8 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg"
+            <a
+              href="#dich-vu"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('dich-vu')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-foreground border-foreground rounded-4xl border-2 px-3 py-2 text-base/8 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg cursor-pointer"
             >
               Dịch vụ & Sản phẩm
-            </Link>
+            </a>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, x: 20 }}

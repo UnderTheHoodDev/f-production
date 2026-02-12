@@ -1,11 +1,13 @@
 import {
+  Building2,
   Camera,
+  Clapperboard,
   Video,
   Radio,
   Film,
   UserCircle,
-  Users,
   Mic,
+  Newspaper,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -18,8 +20,8 @@ export interface Service {
 
 export const services: Service[] = [
   {
-    label: 'Livestream sự kiện',
-    slug: 'livestream-su-kien',
+    label: 'Livestream chuyên nghiệp',
+    slug: 'livestream-chuyen-nghiep',
     icon: Radio,
     description: 'Dịch vụ livestream chuyên nghiệp cho mọi sự kiện',
   },
@@ -36,28 +38,40 @@ export const services: Service[] = [
     description: 'Quay video chuyên nghiệp cho các sự kiện',
   },
   {
-    label: 'TVC - Phim doanh nghiệp',
+    label: 'TVC - Phim Doanh Nghiệp',
     slug: 'tvc-phim-doanh-nghiep',
     icon: Film,
     description: 'Sản xuất TVC và phim giới thiệu doanh nghiệp',
   },
   {
-    label: 'Chụp ảnh Profile chuyên nghiệp',
-    slug: 'chup-anh-profile',
+    label: 'Chụp ảnh Profile, tập thể',
+    slug: 'chup-anh-profile-tap-the',
     icon: UserCircle,
-    description: 'Chụp ảnh profile cá nhân và doanh nghiệp',
-  },
-  {
-    label: 'Quay phim, chụp ảnh Team Building',
-    slug: 'team-building',
-    icon: Users,
-    description: 'Ghi lại hoạt động team building của doanh nghiệp',
+    description: 'Chụp ảnh profile cá nhân, tập thể và doanh nghiệp',
   },
   {
     label: 'Quay phim Podcast',
     slug: 'quay-phim-podcast',
     icon: Mic,
     description: 'Quay và sản xuất podcast chuyên nghiệp',
+  },
+  {
+    label: 'Chụp ảnh kiến trúc',
+    slug: 'chup-anh-kien-truc',
+    icon: Building2,
+    description: 'Chụp ảnh công trình, không gian và kiến trúc chuyên nghiệp',
+  },
+  {
+    label: 'Quay phim kiến trúc',
+    slug: 'quay-phim-kien-truc',
+    icon: Clapperboard,
+    description: 'Quay video kiến trúc và không gian bằng thiết bị chuyên dụng',
+  },
+  {
+    label: 'Truyền thông Báo chí',
+    slug: 'truyen-thong-bao-chi',
+    icon: Newspaper,
+    description: 'Triển khai truyền thông báo chí và lan tỏa hình ảnh thương hiệu',
   },
 ];
 

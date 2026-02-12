@@ -86,7 +86,7 @@ const NavBar = () => {
         href="/"
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:static md:translate-x-0 md:translate-y-0"
       >
-        <Image src="/logo.png" alt="Logo" width={48} height={48} />
+        <Image src="/logo.png" alt="Logo" width={56} height={56} />
       </Link>
 
       {/* Desktop Navigation */}

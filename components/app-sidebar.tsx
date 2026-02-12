@@ -8,6 +8,7 @@ import {
   Images,
   LayoutDashboard,
   PhoneCall,
+  Users,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -50,6 +51,11 @@ const data = {
       title: "Dịch vụ",
       url: "/admin/services",
       icon: Handshake,
+    },
+    {
+      title: "Đối tác",
+      url: "/admin/partners",
+      icon: Users,
     },
     {
       title: "Liên hệ",
@@ -114,3 +120,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   );
 }
+

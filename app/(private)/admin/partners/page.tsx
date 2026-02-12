@@ -1,6 +1,5 @@
-import { Suspense } from "react";
-import { AppSidebar } from "@/components/app-sidebar";
-import { AdminHeaderActions } from "@/components/admin-header";
+import { AppSidebar } from "@/components/app-sidebar"
+import { AdminHeaderActions } from "@/components/admin-header"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -8,25 +7,28 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
 import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { ContactsClient } from "@/components/contacts/contacts-client";
-import { Loader2 } from "lucide-react";
+} from "@/components/ui/sidebar"
+import { prisma } from "@/lib/prisma"
+import { getPublicUrl } from "@/lib/s3"
+import { PartnersPageClient } from "@/components/partners/partners-page-client"
 
-function ContactsLoading() {
-    return (
-        <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-    );
-}
+export default async function PartnersPage() {
+    const partners = await prisma.partner.findMany({
+        orderBy: { order: "asc" },
+    })
 
-export default function ContactsPage() {
+    // Map logoKey to logoUrl using CloudFront/S3
+    const partnersWithUrls = partners.map((p) => ({
+        ...p,
+        logoUrl: p.logoKey ? getPublicUrl(p.logoKey) : undefined,
+    }))
+
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -41,31 +43,23 @@ export default function ContactsPage() {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="/admin/dashboard">Admin</BreadcrumbLink>
+                                    <BreadcrumbLink href="/admin/dashboard">
+                                        Admin
+                                    </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator className="hidden md:block" />
                                 <BreadcrumbItem>
-                                    <BreadcrumbPage>Liên hệ</BreadcrumbPage>
+                                    <BreadcrumbPage>Đối tác</BreadcrumbPage>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                     <AdminHeaderActions />
                 </header>
-                <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
-                    <div>
-                        <h1 className="text-3xl font-semibold text-foreground">
-                            Quản lý liên hệ
-                        </h1>
-                        <p className="text-sm text-muted-foreground mt-1">
-                            Xem và quản lý các yêu cầu liên hệ từ khách hàng
-                        </p>
-                    </div>
-                    <Suspense fallback={<ContactsLoading />}>
-                        <ContactsClient />
-                    </Suspense>
+                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                    <PartnersPageClient initialPartners={partnersWithUrls} />
                 </div>
             </SidebarInset>
         </SidebarProvider>
-    );
+    )
 }

@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import { AdminHeaderActions } from "@/components/admin-header";
 import { VideosGallery } from "@/components/media/videos-gallery";
 import { VideoUploader } from "@/components/media/video-uploader";
 import { MediaTabs } from "@/components/media/media-tabs";
@@ -59,6 +60,7 @@ export default async function VideosPage() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
+          <AdminHeaderActions />
         </header>
         <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
           <div>

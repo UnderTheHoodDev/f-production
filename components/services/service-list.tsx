@@ -10,17 +10,6 @@ const fadeInUp = {
   visible: { opacity: 1, y: 0 },
 };
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-};
-
 const cardVariants = {
   hidden: { opacity: 0, y: 30, scale: 0.95 },
   visible: {
@@ -29,14 +18,13 @@ const cardVariants = {
     scale: 1,
     transition: {
       duration: 0.5,
-      ease: 'easeOut',
     },
   },
 };
 
 const ServiceList = () => {
   return (
-    <div className="layout-padding flex flex-col items-center justify-center gap-3 py-6 md:gap-4 md:py-8 2xl:gap-8 2xl:py-12">
+    <div id="dich-vu" className="layout-padding flex flex-col items-center justify-center gap-3 py-6 md:gap-4 md:py-8 2xl:gap-8 2xl:py-12">
       <motion.span
         initial="hidden"
         whileInView="visible"
@@ -59,10 +47,10 @@ const ServiceList = () => {
             <Link
               key={service.slug}
               href={`/dich-vu/${service.slug}`}
-              className="w-full sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4.5rem)/4)]"
+              className="w-full sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] xl:w-[calc((100%-3rem)/3)]"
             >
               <motion.div
-                variants={cardVariants as any}
+                variants={cardVariants}
                 whileHover={{
                   y: -8,
                   transition: { duration: 0.3, ease: 'easeOut' },

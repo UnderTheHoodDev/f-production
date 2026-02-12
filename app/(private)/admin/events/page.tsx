@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar"
+import { AdminHeaderActions } from "@/components/admin-header"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -51,6 +52,7 @@ export default async function EventsPage() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
+          <AdminHeaderActions />
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <EventsPageClient initialEvents={events} />

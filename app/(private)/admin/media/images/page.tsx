@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import { AdminHeaderActions } from "@/components/admin-header";
 import { ImagesGallery } from "@/components/media/images-gallery";
 import { ImageUploader } from "@/components/media/image-uploader";
 import { MediaTabs } from "@/components/media/media-tabs";
@@ -116,6 +117,7 @@ export default async function ImagesPage({
               </BreadcrumbList>
             </Breadcrumb>
           </div>
+          <AdminHeaderActions />
         </header>
         <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
           <div>

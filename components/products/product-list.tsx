@@ -4,14 +4,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
 import ProductFilterSection from '@/components/products/product-filter-section';
-import ProductItem, { type ProductImage } from '@/components/products/product-item';
+import ProductItem from '@/components/products/product-item';
 import ProductView from '@/components/products/product-view';
 
 // Mapping từ filter type sang service name
 // Chỉ filter có trong map này mới fetch từ API
 const FILTER_SERVICE_MAP: Record<string, string> = {
-  'ẢNH EVENT': 'Chụp ảnh sự kiện',
-  // Thêm các mapping khác sau
+  Livestream: 'Livestream chuyên nghiệp',
+  'Ảnh sự kiện': 'Chụp ảnh sự kiện',
+  'Video sự kiện': 'Quay phim sự kiện',
+  TVC: 'TVC - Phim Doanh Nghiệp',
+  'Ảnh Profile': 'Chụp ảnh Profile, tập thể',
+  Podcast: 'Quay phim Podcast',
+  'Ảnh Kiến trúc': 'Chụp ảnh kiến trúc',
+  'Video Kiến trúc': 'Quay phim kiến trúc',
+  'Đăng Báo chí': 'Truyền thông Báo chí',
 };
 
 type LandingImage = {
@@ -70,7 +77,6 @@ const itemVariants = {
     scale: 1,
     transition: {
       duration: 0.4,
-      ease: 'easeOut',
     },
   },
 };
@@ -78,7 +84,7 @@ const itemVariants = {
 const ITEMS_PER_PAGE = 6;
 
 const ProductList = () => {
-  const [selectedFilter, setSelectedFilter] = useState<string>('ẢNH EVENT');
+  const [selectedFilter, setSelectedFilter] = useState<string>('Livestream');
   const [activeProductView, setActiveProductView] = useState<boolean>(false);
   const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
   
@@ -87,7 +93,6 @@ const ProductList = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
 
   // Fetch images from API
   const fetchImages = useCallback(async (filterType: string, pageNum: number, append = false) => {
@@ -103,7 +108,6 @@ const ProductList = () => {
       }));
       setProducts(placeholderData);
       setHasMore(false);
-      setTotal(6);
       return;
     }
 
@@ -139,7 +143,6 @@ const ProductList = () => {
         }
         
         setHasMore(data.pagination.hasMore);
-        setTotal(data.pagination.total);
       }
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -229,7 +232,7 @@ const ProductList = () => {
                 {products.map((product, index) => (
                   <motion.div
                     key={product.id}
-                    variants={itemVariants as any}
+                    variants={itemVariants}
                     initial="hidden"
                     animate="visible"
                     exit="hidden"

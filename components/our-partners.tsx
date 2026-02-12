@@ -1,9 +1,9 @@
 'use client';
 
-import AutoScroll from 'embla-carousel-auto-scroll';
 import useEmblaCarousel from 'embla-carousel-react';
-import Image from 'next/image';
+import AutoScroll from 'embla-carousel-auto-scroll';
 import { motion } from 'motion/react';
+import { useRef, useState, useEffect } from 'react';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -15,7 +15,20 @@ const fadeIn = {
   visible: { opacity: 1 },
 };
 
-const OurPartners = () => {
+type Partner = {
+  id: string;
+  name: string;
+  logoUrl?: string;
+};
+
+type OurPartnersProps = {
+  partners?: Partner[];
+};
+
+const OurPartners = ({ partners = [] }: OurPartnersProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [needsScroll, setNeedsScroll] = useState(false);
+
   const [emblaRef] = useEmblaCarousel({ loop: true }, [
     AutoScroll({
       speed: 1,
@@ -23,6 +36,26 @@ const OurPartners = () => {
       stopOnInteraction: false,
     }),
   ]);
+
+  // Check if logos overflow the container width
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const checkOverflow = () => {
+      const container = containerRef.current;
+      if (!container) return;
+      // Each logo slot is roughly 220px. If total > container width, we need scrolling.
+      const totalWidth = partners.length * 220;
+      const containerWidth = container.offsetWidth;
+      setNeedsScroll(totalWidth > containerWidth);
+    };
+
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, [partners.length]);
+
+  if (partners.length === 0) return null;
 
   return (
     <div className="layout-padding bg-background-secondary flex flex-col items-center justify-center gap-4 py-6 sm:py-8 lg:gap-8 lg:py-12">
@@ -42,32 +75,68 @@ const OurPartners = () => {
         viewport={{ once: true, amount: 0.3 }}
         variants={fadeIn}
         transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
-        className="w-full py-10"
+        className="w-full py-6"
+        ref={containerRef}
       >
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div
-                key={n}
-                className="flex-[0_0_50%] items-center justify-center md:flex-[0_0_33.3333%] lg:flex-[0_0_25%]"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
+        {needsScroll ? (
+          /* Scrolling carousel for many logos */
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex items-center">
+              {partners.map((partner) => (
+                <div
+                  key={partner.id}
+                  className="flex-[0_0_auto] px-6 sm:px-8 lg:px-10"
                 >
-                  <Image
-                    width={150}
-                    height={150}
-                    unoptimized
-                    src="/partners/samsung.png"
-                    alt={`Partner ${n}`}
-                    className="h-auto w-32 object-contain sm:w-36 lg:w-40"
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                  >
+                    {partner.logoUrl ? (
+                      <img
+                        src={partner.logoUrl}
+                        alt={partner.name}
+                        title={partner.name}
+                        className="h-20 w-auto object-contain transition-all duration-300 sm:h-24 lg:h-28"
+                      />
+                    ) : (
+                      <div className="flex h-12 items-center justify-center rounded-lg bg-muted px-4 sm:h-14 lg:h-16">
+                        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+                          {partner.name}
+                        </span>
+                      </div>
+                    )}
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* Centered layout for few logos */
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 lg:gap-16">
+            {partners.map((partner) => (
+              <motion.div
+                key={partner.id}
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              >
+                {partner.logoUrl ? (
+                  <img
+                    src={partner.logoUrl}
+                    alt={partner.name}
+                    title={partner.name}
+                    className="h-16 w-auto object-contain transition-all duration-300 sm:h-20 lg:h-24"
                   />
-                </motion.div>
-              </div>
+                ) : (
+                  <div className="flex h-12 items-center justify-center rounded-lg bg-muted px-4 sm:h-14 lg:h-16">
+                    <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+                      {partner.name}
+                    </span>
+                  </div>
+                )}
+              </motion.div>
             ))}
           </div>
-        </div>
+        )}
       </motion.div>
     </div>
   );

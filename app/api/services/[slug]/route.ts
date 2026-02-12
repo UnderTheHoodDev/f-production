@@ -6,11 +6,15 @@ import { getPublicUrl } from "@/lib/s3";
 const SLUG_SERVICE_MAP: Record<string, string> = {
     "chup-anh-su-kien": "Chụp Ảnh Sự Kiện",
     "quay-phim-su-kien": "Quay Phim Sự Kiện",
+    "livestream-chuyen-nghiep": "Livestream Chuyên Nghiệp",
     "livestream-su-kien": "Livestream Sự Kiện",
     "tvc-phim-doanh-nghiep": "TVC - Phim Doanh Nghiệp",
+    "chup-anh-profile-tap-the": "Chụp Ảnh Profile, Tập Thể",
     "chup-anh-profile": "Chụp Ảnh Profile Chuyên Nghiệp",
-    "team-building": "Quay Phim, Chụp Ảnh Team Building",
     "quay-phim-podcast": "Quay Phim Podcast",
+    "chup-anh-kien-truc": "Chụp Ảnh Kiến Trúc",
+    "quay-phim-kien-truc": "Quay Phim Kiến Trúc",
+    "truyen-thong-bao-chi": "Truyền Thông Báo Chí",
 };
 
 export async function GET(

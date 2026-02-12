@@ -381,95 +381,50 @@ export function VideosGallery({ items }: VideosGalleryProps) {
                 : "border-border"
                 }`}
             >
-              {item.title && (
-                <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 dark:bg-muted/20">
-                  <Checkbox
-                    checked={selectedIds.has(item.id)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleSelect(item.id, index, e);
-                    }}
-                    className="shrink-0"
-                  />
-                  <p className="text-xs font-medium text-foreground line-clamp-1 flex-1">
-                    {item.title}
-                  </p>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-accent rounded-sm"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Xem chi tiết</DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditClick(item);
-                        }}
-                      >
-                        Chỉnh sửa
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick(item.id, item.title);
-                        }}
-                        disabled={deletingId === item.id}
-                      >
-                        {deletingId === item.id ? "Đang xóa..." : "Xóa"}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )}
-              {!item.title && (
-                <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Checkbox
-                    checked={selectedIds.has(item.id)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleSelect(item.id, index, e);
-                    }}
-                    className="bg-background/80 backdrop-blur-sm"
-                  />
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        className="p-1 hover:bg-accent/80 rounded-sm bg-background/80 backdrop-blur-sm"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Xem chi tiết</DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditClick(item);
-                        }}
-                      >
-                        Chỉnh sửa
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick(item.id, item.title);
-                        }}
-                        disabled={deletingId === item.id}
-                      >
-                        {deletingId === item.id ? "Đang xóa..." : "Xóa"}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )}
+              <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 dark:bg-muted/20">
+                <Checkbox
+                  checked={selectedIds.has(item.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleSelect(item.id, index, e);
+                  }}
+                  className="shrink-0"
+                />
+                <p className={`text-xs font-medium line-clamp-1 flex-1 ${item.title ? 'text-foreground' : 'text-muted-foreground italic'}`}>
+                  {item.title || "Không có tiêu đề"}
+                </p>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-accent rounded-sm"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Xem chi tiết</DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditClick(item);
+                      }}
+                    >
+                      Chỉnh sửa
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(item.id, item.title);
+                      }}
+                      disabled={deletingId === item.id}
+                    >
+                      {deletingId === item.id ? "Đang xóa..." : "Xóa"}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
               <div
                 className="relative aspect-4/3 overflow-hidden bg-muted/30 dark:bg-muted/20 p-2 cursor-pointer"
                 onClick={() => {

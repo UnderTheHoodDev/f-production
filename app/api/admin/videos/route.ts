@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -38,6 +39,8 @@ export async function POST(request: Request) {
         showOnLanding: true,
       },
     });
+
+    revalidatePath("/admin/media/videos");
 
     return NextResponse.json({ success: true, video });
   } catch (error) {
