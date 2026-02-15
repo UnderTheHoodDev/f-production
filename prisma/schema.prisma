@@ -57,6 +57,7 @@ model Event {
 model Service {
   id          String   @id @default(uuid())
   name        String
+  slug        String   @unique
   description String?
   eventOrder  String[]
   createdAt   DateTime @default(now())

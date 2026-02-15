@@ -1,8 +1,9 @@
 'use client';
 
 import ProductItem from '@/components/products/product-item';
+import ProductView from '@/components/products/product-view';
 import { cn } from '@/lib/utils';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const INITIAL_ITEMS_PER_EVENT = 9;
 const LOAD_MORE_INCREMENT = 9;
@@ -35,6 +36,8 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
     const [events, setEvents] = useState<EventData[]>([]);
     const [loading, setLoading] = useState(true);
     const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
+    const [activeProductView, setActiveProductView] = useState(false);
+    const [activeProductIndex, setActiveProductIndex] = useState(0);
     const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,6 +69,37 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
             [eventId]: (prev[eventId] || INITIAL_ITEMS_PER_EVENT) + LOAD_MORE_INCREMENT,
         }));
     };
+
+    // Flatten tất cả visible products từ mọi events để dùng cho ProductView navigation
+    const allVisibleProducts = useMemo(() => {
+        return events.flatMap((event) => {
+            const count = visibleCounts[event.id] || INITIAL_ITEMS_PER_EVENT;
+            return event.products.slice(0, count).map((product) => ({
+                id: product.id,
+                title: product.title || event.title || null,
+                type: product.type,
+                format: product.format,
+                url: product.url,
+                youtubeUrl: product.youtubeUrl,
+                thumbnail: product.thumbnail,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }));
+        });
+    }, [events, visibleCounts]);
+
+    // Tính global index cho một product trong một event cụ thể
+    const getGlobalIndex = useCallback((eventId: string, localIndex: number) => {
+        let globalIdx = 0;
+        for (const event of events) {
+            if (event.id === eventId) {
+                return globalIdx + localIndex;
+            }
+            const count = visibleCounts[event.id] || INITIAL_ITEMS_PER_EVENT;
+            globalIdx += Math.min(event.products.length, count);
+        }
+        return globalIdx;
+    }, [events, visibleCounts]);
 
     const calculateLineHeights = useCallback(() => {
         if (!containerRef.current) return;
@@ -130,112 +164,125 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
     }
 
     return (
-        <div
-            ref={containerRef}
-            className="layout-padding mb-3 flex flex-col gap-4 py-6 md:py-10 lg:mb-4"
-        >
-            {events.map((event, index) => {
-                const isActive = activeIndex === index;
-                const lineHeight = lineHeights[index] || 0;
-                const visibleCount = visibleCounts[event.id] || INITIAL_ITEMS_PER_EVENT;
-                const visibleProducts = event.products.slice(0, visibleCount);
-                const hasMoreProducts = event.products.length > visibleCount;
+        <>
+            <div
+                ref={containerRef}
+                className="layout-padding mb-3 flex flex-col gap-4 py-6 md:py-10 lg:mb-4"
+            >
+                {events.map((event, index) => {
+                    const isActive = activeIndex === index;
+                    const lineHeight = lineHeights[index] || 0;
+                    const visibleCount = visibleCounts[event.id] || INITIAL_ITEMS_PER_EVENT;
+                    const visibleProducts = event.products.slice(0, visibleCount);
+                    const hasMoreProducts = event.products.length > visibleCount;
 
-                return (
-                    <div
-                        key={event.id}
-                        ref={(el) => {
-                            sectionRefs.current[index] = el;
-                        }}
-                        className={cn(
-                            'relative flex flex-1 justify-center gap-2 transition-all duration-300 sm:gap-4'
-                        )}
-                    >
+                    return (
                         <div
+                            key={event.id}
+                            ref={(el) => {
+                                sectionRefs.current[index] = el;
+                            }}
                             className={cn(
-                                'relative flex min-w-12 flex-col items-center md:min-w-16'
+                                'relative flex flex-1 justify-center gap-2 transition-all duration-300 sm:gap-4'
                             )}
                         >
                             <div
                                 className={cn(
-                                    'absolute left-1/2 h-[calc(100%+16px)] w-[1.5px] -translate-x-1/2 bg-[#DADADA] lg:w-0.5'
-                                )}
-                            />
-                            <div
-                                className="bg-primary absolute left-1/2 w-[1.5px] -translate-x-1/2 lg:w-0.5"
-                                style={{ height: `${lineHeight}px` }}
-                            />
-                            <div
-                                className={cn(
-                                    'z-10 flex items-center justify-center rounded-full border-2 bg-white transition-all duration-300',
-                                    isActive
-                                        ? 'border-primary size-12 sm:size-14 lg:size-16'
-                                        : 'size-10 border-[#DADADA] sm:size-12 lg:size-14'
+                                    'relative flex min-w-12 flex-col items-center md:min-w-16'
                                 )}
                             >
                                 <div
                                     className={cn(
-                                        'rounded-full transition-all duration-300',
-                                        isActive
-                                            ? 'bg-primary size-8 sm:size-10 lg:size-12'
-                                            : 'size-6 bg-[#DADADA] sm:size-8 lg:size-10'
+                                        'absolute left-1/2 h-[calc(100%+16px)] w-[1.5px] -translate-x-1/2 bg-[#DADADA] lg:w-0.5'
                                     )}
                                 />
+                                <div
+                                    className="bg-primary absolute left-1/2 w-[1.5px] -translate-x-1/2 lg:w-0.5"
+                                    style={{ height: `${lineHeight}px` }}
+                                />
+                                <div
+                                    className={cn(
+                                        'z-10 flex items-center justify-center rounded-full border-2 bg-white transition-all duration-300',
+                                        isActive
+                                            ? 'border-primary size-12 sm:size-14 lg:size-16'
+                                            : 'size-10 border-[#DADADA] sm:size-12 lg:size-14'
+                                    )}
+                                >
+                                    <div
+                                        className={cn(
+                                            'rounded-full transition-all duration-300',
+                                            isActive
+                                                ? 'bg-primary size-8 sm:size-10 lg:size-12'
+                                                : 'size-6 bg-[#DADADA] sm:size-8 lg:size-10'
+                                        )}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div
-                            className={cn(
-                                'mt-2.5 flex flex-col gap-3 md:gap-4 lg:mt-3.25 lg:gap-5'
-                            )}
-                        >
-                            <span
+                            <div
                                 className={cn(
-                                    '-translate-y-px font-medium transition-all duration-300',
-                                    isActive
-                                        ? 'text-primary xsm:text-xl text-lg sm:text-2xl lg:text-3xl'
-                                        : 'xsm:text-lg text-base text-[#AFAFAF] sm:text-xl lg:text-2xl'
+                                    'mt-2.5 flex flex-col gap-3 md:gap-4 lg:mt-3.25 lg:gap-5'
                                 )}
                             >
-                                {event.title}
-                            </span>
-
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:gap-3 lg:grid-cols-3">
-                                {visibleProducts.map((product) => (
-                                    <ProductItem
-                                        key={product.id}
-                                        type={product.type}
-                                        handleActiveProductView={() => { }}
-                                        image={
-                                            product.type === 'image'
-                                                ? {
-                                                    id: product.id,
-                                                    url: product.url,
-                                                    title: product.title,
-                                                    format: product.format,
-                                                }
-                                                : undefined
-                                        }
-                                        thumbnail={product.thumbnail || undefined}
-                                        eventName={event.title}
-                                        eventClient={event.client || undefined}
-                                    />
-                                ))}
-                            </div>
-
-                            {hasMoreProducts && (
-                                <button
-                                    onClick={() => handleLoadMore(event.id)}
-                                    className="bg-primary/10 text-primary hover:bg-primary/20 mx-auto rounded-full px-6 py-2 font-medium transition-colors"
+                                <span
+                                    className={cn(
+                                        '-translate-y-px font-medium transition-all duration-300',
+                                        isActive
+                                            ? 'text-primary xsm:text-xl text-lg sm:text-2xl lg:text-3xl'
+                                            : 'xsm:text-lg text-base text-[#AFAFAF] sm:text-xl lg:text-2xl'
+                                    )}
                                 >
-                                    Xem thêm
-                                </button>
-                            )}
+                                    {event.title}
+                                </span>
+
+                                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:gap-3 lg:grid-cols-3">
+                                    {visibleProducts.map((product, productIndex) => (
+                                        <ProductItem
+                                            key={product.id}
+                                            type={product.type}
+                                            handleActiveProductView={() => {
+                                                setActiveProductIndex(getGlobalIndex(event.id, productIndex));
+                                                setActiveProductView(true);
+                                            }}
+                                            image={
+                                                product.type === 'image'
+                                                    ? {
+                                                        id: product.id,
+                                                        url: product.url,
+                                                        title: product.title,
+                                                        format: product.format,
+                                                    }
+                                                    : undefined
+                                            }
+                                            thumbnail={product.thumbnail || undefined}
+                                            eventName={event.title}
+                                            eventClient={event.client || undefined}
+                                        />
+                                    ))}
+                                </div>
+
+                                {hasMoreProducts && (
+                                    <button
+                                        onClick={() => handleLoadMore(event.id)}
+                                        className="bg-primary/10 text-primary hover:bg-primary/20 mx-auto rounded-full px-6 py-2 font-medium transition-colors"
+                                    >
+                                        Xem thêm
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
-        </div>
+                    );
+                })}
+            </div>
+
+            {activeProductView && allVisibleProducts.length > 0 && (
+                <ProductView
+                    products={allVisibleProducts}
+                    initialIndex={activeProductIndex}
+                    setActiveProductView={setActiveProductView}
+                />
+            )}
+        </>
     );
 };
 
