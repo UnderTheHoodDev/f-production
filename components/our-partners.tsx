@@ -21,13 +21,10 @@ type Partner = {
   logoUrl?: string;
 };
 
-type OurPartnersProps = {
-  partners?: Partner[];
-};
-
-const OurPartners = ({ partners = [] }: OurPartnersProps) => {
+const OurPartners = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [needsScroll, setNeedsScroll] = useState(false);
+  const [partners, setPartners] = useState<Partner[]>([]);
 
   const [emblaRef] = useEmblaCarousel({ loop: true }, [
     AutoScroll({
@@ -36,6 +33,22 @@ const OurPartners = ({ partners = [] }: OurPartnersProps) => {
       stopOnInteraction: false,
     }),
   ]);
+
+  // Fetch partners from API
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const response = await fetch('/api/partners');
+        const data = await response.json();
+        if (data.success) {
+          setPartners(data.partners);
+        }
+      } catch (error) {
+        console.error('Error fetching partners:', error);
+      }
+    };
+    fetchPartners();
+  }, []);
 
   // Check if logos overflow the container width
   useEffect(() => {

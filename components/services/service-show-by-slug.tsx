@@ -3,6 +3,7 @@
 import ProductItem from '@/components/products/product-item';
 import ProductView from '@/components/products/product-view';
 import { cn } from '@/lib/utils';
+import { getServiceBySlug } from '@/lib/services-data';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const INITIAL_ITEMS_PER_EVENT = 9;
@@ -279,116 +280,171 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
   }
 
   if (events.length === 0) {
-    return null;
+    const service = getServiceBySlug(slug);
+    if (!service) return null;
+    const Icon = service.icon;
+
+    return (
+      <>
+        <section className="layout-padding py-8 sm:py-12 2xl:py-16">
+          <div className="mx-auto max-w-4xl">
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-primary/30 text-primary mb-6 flex size-20 items-center justify-center rounded-2xl">
+                <Icon className="size-10" />
+              </div>
+              <h1 className="text-background mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
+                {service.label}
+              </h1>
+              <p className="text-background-secondary max-w-2xl text-lg md:text-xl">
+                {service.description}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="layout-padding pb-8 sm:pb-12 2xl:pb-16">
+          <div className="mx-auto max-w-4xl">
+            <div className="bg-card rounded-2xl border p-8 md:p-12">
+              <div className="text-muted-foreground space-y-6 text-center">
+                <p className="text-lg">
+                  Nội dung chi tiết về dịch vụ{' '}
+                  <span className="text-primary font-semibold">
+                    {service.label}
+                  </span>{' '}
+                  sẽ được cập nhật.
+                </p>
+                <div className="bg-surface-alt mx-auto h-[1.5px] w-full" />
+                <p className="text-sm">
+                  Liên hệ với chúng tôi để biết thêm chi tiết về dịch vụ này.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+    );
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="layout-padding mb-3 flex flex-col gap-4 py-6 md:py-10 lg:mb-4"
-    >
-      {events.map((event, index) => {
-        const isActive = activeIndex === index;
-        const lineHeight = lineHeights[index] || 0;
-        const visibleCount = visibleCounts[event.id] || INITIAL_ITEMS_PER_EVENT;
-        const visibleProducts = event.products.slice(0, visibleCount);
-        const hasMoreProducts = event.products.length > visibleCount;
+    <>
+      <div
+        ref={containerRef}
+        className="layout-padding mb-3 flex flex-col gap-4 py-6 md:py-10 lg:mb-4"
+      >
+        {events.map((event, index) => {
+          const isActive = activeIndex === index;
+          const lineHeight = lineHeights[index] || 0;
+          const visibleCount = visibleCounts[event.id] || INITIAL_ITEMS_PER_EVENT;
+          const visibleProducts = event.products.slice(0, visibleCount);
+          const hasMoreProducts = event.products.length > visibleCount;
 
-        return (
-          <div
-            key={event.id}
-            ref={(el) => {
-              sectionRefs.current[index] = el;
-            }}
-            className={cn(
-              'relative flex flex-1 justify-center gap-2 transition-all duration-300 sm:gap-4'
-            )}
-          >
+          return (
             <div
+              key={event.id}
+              ref={(el) => {
+                sectionRefs.current[index] = el;
+              }}
               className={cn(
-                'relative flex min-w-12 flex-col items-center md:min-w-16'
+                'relative flex flex-1 justify-center gap-2 transition-all duration-300 sm:gap-4'
               )}
             >
               <div
                 className={cn(
-                  'absolute left-1/2 h-[calc(100%+16px)] w-[1.5px] -translate-x-1/2 bg-[#DADADA] lg:w-0.5'
-                )}
-              />
-              <div
-                className="bg-primary absolute left-1/2 w-[1.5px] -translate-x-1/2 lg:w-0.5"
-                style={{ height: `${lineHeight}px` }}
-              />
-              <div
-                className={cn(
-                  'z-10 flex items-center justify-center rounded-full border-2 bg-white transition-all duration-300',
-                  isActive
-                    ? 'border-primary size-12 sm:size-14 lg:size-16'
-                    : 'size-10 border-[#DADADA] sm:size-12 lg:size-14'
+                  'relative flex min-w-12 flex-col items-center md:min-w-16'
                 )}
               >
                 <div
                   className={cn(
-                    'rounded-full transition-all duration-300',
-                    isActive
-                      ? 'bg-primary size-8 sm:size-10 lg:size-12'
-                      : 'size-6 bg-[#DADADA] sm:size-8 lg:size-10'
+                    'absolute left-1/2 h-[calc(100%+16px)] w-[1.5px] -translate-x-1/2 bg-[#DADADA] lg:w-0.5'
                   )}
                 />
+                <div
+                  className="bg-primary absolute left-1/2 w-[1.5px] -translate-x-1/2 lg:w-0.5"
+                  style={{ height: `${lineHeight}px` }}
+                />
+                <div
+                  className={cn(
+                    'z-10 flex items-center justify-center rounded-full border-2 bg-white transition-all duration-300',
+                    isActive
+                      ? 'border-primary size-12 sm:size-14 lg:size-16'
+                      : 'size-10 border-[#DADADA] sm:size-12 lg:size-14'
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'rounded-full transition-all duration-300',
+                      isActive
+                        ? 'bg-primary size-8 sm:size-10 lg:size-12'
+                        : 'size-6 bg-[#DADADA] sm:size-8 lg:size-10'
+                    )}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div
-              className={cn(
-                'mt-2.5 flex flex-col gap-3 md:gap-4 lg:mt-3.25 lg:gap-5'
-              )}
-            >
-              <span
+              <div
                 className={cn(
-                  '-translate-y-px font-medium transition-all duration-300',
-                  isActive
-                    ? 'text-primary xsm:text-xl text-lg sm:text-2xl lg:text-3xl'
-                    : 'xsm:text-lg text-base text-[#AFAFAF] sm:text-xl lg:text-2xl'
+                  'mt-2.5 flex flex-col gap-3 md:gap-4 lg:mt-3.25 lg:gap-5'
                 )}
               >
-                {event.title}
-              </span>
-
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:gap-3 lg:grid-cols-3">
-                {visibleProducts.map((product) => (
-                  <ProductItem
-                    key={product.id}
-                    type={product.type}
-                    handleActiveProductView={() => { }}
-                    image={
-                      product.type === 'image'
-                        ? {
-                          id: product.id,
-                          url: product.url,
-                          title: product.title,
-                          format: product.format,
-                        }
-                        : undefined
-                    }
-                    thumbnail={product.thumbnail || undefined}
-                    eventName={event.title}
-                    eventClient={event.client || undefined}
-                  />
-                ))}
-              </div>
-
-              {hasMoreProducts && (
-                <button
-                  onClick={() => handleLoadMore(event.id)}
-                  className="bg-primary/10 text-primary hover:bg-primary/20 mx-auto rounded-full px-6 py-2 font-medium transition-colors"
+                <span
+                  className={cn(
+                    '-translate-y-px font-medium transition-all duration-300',
+                    isActive
+                      ? 'text-primary xsm:text-xl text-lg sm:text-2xl lg:text-3xl'
+                      : 'xsm:text-lg text-base text-[#AFAFAF] sm:text-xl lg:text-2xl'
+                  )}
                 >
-                  Xem thêm
-                </button>
-              )}
+                  {event.title}
+                </span>
+
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:gap-3 lg:grid-cols-3">
+                  {visibleProducts.map((product, productIndex) => (
+                    <ProductItem
+                      key={product.id}
+                      type={product.type}
+                      handleActiveProductView={() => {
+                        setActiveProductIndex(getGlobalIndex(event.id, productIndex));
+                        setActiveProductView(true);
+                      }}
+                      image={
+                        product.type === 'image'
+                          ? {
+                            id: product.id,
+                            url: product.url,
+                            title: product.title,
+                            format: product.format,
+                          }
+                          : undefined
+                      }
+                      thumbnail={product.thumbnail || undefined}
+                      eventName={event.title}
+                      eventClient={event.client || undefined}
+                    />
+                  ))}
+                </div>
+
+                {hasMoreProducts && (
+                  <button
+                    onClick={() => handleLoadMore(event.id)}
+                    className="bg-primary/10 text-primary hover:bg-primary/20 mx-auto rounded-full px-6 py-2 font-medium transition-colors"
+                  >
+                    Xem thêm
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+
+      {activeProductView && allVisibleProducts.length > 0 && (
+        <ProductView
+          products={allVisibleProducts}
+          initialIndex={activeProductIndex}
+          setActiveProductView={setActiveProductView}
+        />
+      )}
+    </>
   );
 };
 
