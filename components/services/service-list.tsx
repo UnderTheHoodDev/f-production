@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'motion/react';
+import Link from 'next/link';
 
 import { services } from '@/lib/services-data';
 
@@ -24,7 +24,10 @@ const cardVariants = {
 
 const ServiceList = () => {
   return (
-    <div id="dich-vu" className="layout-padding flex flex-col items-center justify-center gap-3 py-6 md:gap-4 md:py-8 2xl:gap-8 2xl:py-12">
+    <div
+      id="dich-vu"
+      className="layout-padding flex flex-col items-center justify-center gap-3 py-6 md:gap-4 md:py-8 2xl:gap-8 2xl:py-12"
+    >
       <motion.span
         initial="hidden"
         whileInView="visible"
@@ -39,7 +42,7 @@ const ServiceList = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="mx-auto flex flex-wrap justify-center gap-4 xl:gap-6 xl:max-w-[1280px]"
+        className="mx-auto flex flex-wrap justify-center gap-4 xl:max-w-[1280px] xl:gap-6"
       >
         {services.map((service) => {
           const Icon = service.icon;
@@ -80,4 +83,3 @@ const ServiceList = () => {
 };
 
 export default ServiceList;
-

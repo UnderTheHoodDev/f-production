@@ -1,13 +1,13 @@
-import HeroSection from "@/components/layout/hero-section";
-import OurPartners from "@/components/our-partners";
-import ProductList from "@/components/products/product-list";
-import ServiceList from "@/components/services/service-list";
-import { prisma } from "@/lib/prisma";
-import { getPublicUrl } from "@/lib/s3";
+import HeroSection from '@/components/layout/hero-section';
+import OurPartners from '@/components/our-partners';
+import ProductList from '@/components/products/product-list';
+import ServiceList from '@/components/services/service-list';
+import { prisma } from '@/lib/prisma';
+import { getPublicUrl } from '@/lib/s3';
 
 export default async function HomePage() {
   const partners = await prisma.partner.findMany({
-    orderBy: { order: "asc" },
+    orderBy: { order: 'asc' },
   });
 
   const partnersWithUrls = partners.map((p) => ({

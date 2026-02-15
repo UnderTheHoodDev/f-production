@@ -1,6 +1,7 @@
 import { Facebook, Instagram, Mail, Phone, Youtube } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { title } from 'process';
 
 const Footer = () => {
   const footerLinks = [
@@ -17,19 +18,30 @@ const Footer = () => {
     {
       label: 'Dịch vụ',
       links: [
-        { title: 'Livestream sự kiện', url: '#' },
-        { title: 'Chụp ảnh sự kiện', url: '#' },
-        { title: 'Quay phim sự kiện', url: '#' },
-        { title: 'TVC - Phim doanh nghiệp', url: '#' },
-        { title: 'Chụp ảnh Profile chuyên nghiệp', url: '#' },
-        { title: 'Quay phim, chụp ảnh Team Building', url: '#' },
-        { title: 'Quay phim Podcast', url: '#' },
+        {
+          title: 'Livestream chuyên nghiệp',
+          url: '/dich-vu/livestream-chuyen-nghiep',
+        },
+        { title: 'Chụp ảnh sự kiện', url: '/dich-vu/chup-anh-su-kien' },
+        { title: 'Quay phim sự kiện', url: '/dich-vu/quay-phim-su-kien' },
+        {
+          title: 'TVC - Phim doanh nghiệp',
+          url: '/dich-vu/tvc-phim-doanh-nghiep',
+        },
+        {
+          title: 'Chụp ảnh Profile, tập thể',
+          url: '/dich-vu/chup-anh-profile-tap-the',
+        },
+        { title: 'Quay phim Podcast', url: '/dich-vu/quay-phim-podcast' },
+        { title: 'Chụp ảnh kiến trúc', url: '/dich-vu/chup-anh-kien-truc' },
+        { title: 'Quay phim kiến trúc', url: '/dich-vu/quay-phim-kien-truc' },
+        { title: 'Truyền thông Báo chí', url: '/dich-vu/truyen-thong-bao-chi' },
       ],
     },
     {
       label: 'Liên hệ',
       contents: [
-        { type: Phone, content: '0123 456 789' },
+        { type: Phone, content: '078.6969.888' },
         { type: Mail, content: 'fproduction.work@gmail.com' },
       ],
     },
@@ -57,7 +69,7 @@ const Footer = () => {
               return (
                 <div
                   key={section.label}
-                  className="flex w-full flex-col gap-2 sm:gap-3 md:w-[calc(33%-8px)] lg:w-fit"
+                  className="flex w-full flex-col flex-wrap gap-2 sm:gap-3 md:w-[calc(33%-8px)] lg:w-fit"
                 >
                   <span className="text-primary text-lg font-medium md:text-xl">
                     {section.label}
@@ -68,7 +80,7 @@ const Footer = () => {
                         key={index}
                         className="text-foreground flex items-center gap-2 text-sm"
                       >
-                        <content.type className="size-4" />
+                        <content.type className="size-4!" />
                         <span>{content.content}</span>
                       </div>
                     ))}

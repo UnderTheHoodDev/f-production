@@ -2,23 +2,22 @@
 
 import { clsx } from 'clsx';
 import { ChevronDown, Menu } from 'lucide-react';
+import {
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+} from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import {
-  motion,
-  useScroll,
-  useMotionValueEvent,
-  useTransform,
-} from 'motion/react';
 
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -28,10 +27,11 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { services } from '@/lib/services-data';
 
 const NavBar = () => {
@@ -153,7 +153,7 @@ const NavBar = () => {
                               <Icon className="size-4" />
                             </div>
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-sm font-medium leading-tight">
+                              <span className="text-sm leading-tight font-medium">
                                 {service.label}
                               </span>
                               <span className="text-muted-foreground line-clamp-1 text-xs">
@@ -238,7 +238,7 @@ const NavBar = () => {
                 />
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <div className="flex flex-col gap-1 py-2 pl-4">
+                <div className="flex flex-col gap-1 py-2">
                   {services.map((service) => {
                     const Icon = service.icon;
                     const isActive = pathname === `/dich-vu/${service.slug}`;

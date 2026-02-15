@@ -1,49 +1,72 @@
 'use client';
 
+import { getPublicUrl } from '@/lib/s3';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 
 const HeroSection = () => {
   return (
-    <div className="layout-padding flex h-140 w-full items-center bg-[#9B9B9B] sm:h-150 md:h-160 lg:min-h-screen">
-      <div className="flex flex-col gap-6 pb-0 sm:pb-4 lg:pb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-          className="mt-4 flex gap-2 sm:gap-3 lg:gap-5"
+    <>
+      <div className="relative mt-16 h-140 w-full sm:mt-0 sm:h-150 md:h-160 lg:min-h-screen">
+        <video
+          muted
+          autoPlay
+          loop
+          playsInline
+          className="absolute h-full w-full object-cover"
         >
+          <source
+            src={getPublicUrl('videos/header_mobile.mp4')}
+            media="(max-width: 767px)"
+            type="video/mp4"
+          />
+          <source
+            src={getPublicUrl('videos/header.mp4')}
+            media="(min-width: 768px)"
+            type="video/mp4"
+          />
+        </video>
+        <div className="layout-padding absolute bottom-[30%] z-0 flex w-full -translate-y-1/4 flex-col gap-6 md:top-1/4 md:translate-y-1/2">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4, ease: 'easeOut' }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+            className="flex w-full justify-center gap-4 md:justify-start"
           >
-            <a
-              href="#dich-vu"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('dich-vu')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-foreground border-foreground rounded-4xl border-2 px-3 py-2 text-base/8 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg cursor-pointer"
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.4, ease: 'easeOut' }}
             >
-              Dịch vụ & Sản phẩm
-            </a>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.5, ease: 'easeOut' }}
-          >
-            <Link
-              href="/lien-he"
-              className="bg-background text-foreground rounded-4xl border-2 border-transparent px-3 py-2 text-base/8 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg"
+              <Link
+                href="#dich-vu"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById('dich-vu')
+                    ?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-foreground border-foreground cursor-pointer rounded-4xl border-2 px-3 py-2 text-base/8 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg"
+              >
+                Dịch vụ & Sản phẩm
+              </Link>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.5, ease: 'easeOut' }}
             >
-              Đặt lịch
-            </Link>
+              <Link
+                href="/lien-he"
+                className="border-primary bg-primary text-background rounded-4xl border-2 px-3 py-2 text-base/8 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg"
+              >
+                Đặt lịch
+              </Link>
+            </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

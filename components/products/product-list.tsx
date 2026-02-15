@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useCallback, useEffect, useState } from 'react';
 
 import ProductFilterSection from '@/components/products/product-filter-section';
 import ProductItem from '@/components/products/product-item';
@@ -87,7 +87,7 @@ const ProductList = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>('Livestream');
   const [activeProductView, setActiveProductView] = useState<boolean>(false);
   const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
-  
+
   // State for API fetched data
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -95,61 +95,69 @@ const ProductList = () => {
   const [page, setPage] = useState<number>(1);
 
   // Fetch images from API
-  const fetchImages = useCallback(async (filterType: string, pageNum: number, append = false) => {
-    const serviceName = FILTER_SERVICE_MAP[filterType];
-    
-    // Nếu filter không có trong map, sử dụng placeholder data
-    if (!serviceName) {
-      const placeholderData: ProductItem[] = Array.from({ length: 6 }, (_, i) => ({
-        id: `placeholder-${i}`,
-        type: 'image' as const,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }));
-      setProducts(placeholderData);
-      setHasMore(false);
-      return;
-    }
+  const fetchImages = useCallback(
+    async (filterType: string, pageNum: number, append = false) => {
+      const serviceName = FILTER_SERVICE_MAP[filterType];
 
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams({
-        serviceName,
-        page: pageNum.toString(),
-        limit: ITEMS_PER_PAGE.toString(),
-      });
-
-      const response = await fetch(`/api/landing/images?${params}`);
-      const data = await response.json();
-
-      if (data.success) {
-        const newImages: ProductItem[] = data.images.map((img: LandingImage) => ({
-          id: img.id,
-          type: 'image' as const,
-          title: img.title,
-          format: img.format,
-          url: img.url,
-          publicId: img.publicId,
-          eventName: img.event.title,
-          eventClient: img.event.client,
-          createdAt: new Date(img.createdAt),
-          updatedAt: new Date(img.updatedAt),
-        }));
-
-        if (append) {
-          setProducts((prev) => [...prev, ...newImages]);
-        } else {
-          setProducts(newImages);
-        }
-        
-        setHasMore(data.pagination.hasMore);
+      // Nếu filter không có trong map, sử dụng placeholder data
+      if (!serviceName) {
+        const placeholderData: ProductItem[] = Array.from(
+          { length: 6 },
+          (_, i) => ({
+            id: `placeholder-${i}`,
+            type: 'image' as const,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+        );
+        setProducts(placeholderData);
+        setHasMore(false);
+        return;
       }
-    } catch (error) {
-      console.error('Error fetching images:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams({
+          serviceName,
+          page: pageNum.toString(),
+          limit: ITEMS_PER_PAGE.toString(),
+        });
+
+        const response = await fetch(`/api/landing/images?${params}`);
+        const data = await response.json();
+
+        if (data.success) {
+          const newImages: ProductItem[] = data.images.map(
+            (img: LandingImage) => ({
+              id: img.id,
+              type: 'image' as const,
+              title: img.title,
+              format: img.format,
+              url: img.url,
+              publicId: img.publicId,
+              eventName: img.event.title,
+              eventClient: img.event.client,
+              createdAt: new Date(img.createdAt),
+              updatedAt: new Date(img.updatedAt),
+            })
+          );
+
+          if (append) {
+            setProducts((prev) => [...prev, ...newImages]);
+          } else {
+            setProducts(newImages);
+          }
+
+          setHasMore(data.pagination.hasMore);
+        }
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   // Fetch on filter change
   useEffect(() => {
@@ -214,10 +222,33 @@ const ProductList = () => {
               handleFilterType={handleFilterType}
             />
           </motion.div>
-          
+
           {isLoading && products.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-[#1B1B1B]" />
+            </div>
+          ) : !isLoading && products.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-background h-16 w-16"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <p className="text-background text-lg font-medium">
+                Chưa có sản phẩm nào
+              </p>
+              <p className="text-sm text-gray-400">
+                Sản phẩm sẽ được cập nhật sớm nhất
+              </p>
             </div>
           ) : (
             <motion.div
@@ -244,7 +275,9 @@ const ProductList = () => {
                   >
                     <ProductItem
                       type={product.type}
-                      handleActiveProductView={() => handleActiveProductView(index)}
+                      handleActiveProductView={() =>
+                        handleActiveProductView(index)
+                      }
                       image={
                         product.publicId || product.url
                           ? {
@@ -265,7 +298,7 @@ const ProductList = () => {
             </motion.div>
           )}
         </div>
-        
+
         {hasMore && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -281,7 +314,7 @@ const ProductList = () => {
           </motion.div>
         )}
       </div>
-      
+
       {activeProductView && products.length > 0 && (
         <ProductView
           products={productViewItems}
@@ -294,4 +327,3 @@ const ProductList = () => {
 };
 
 export default ProductList;
-

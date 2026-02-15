@@ -1,9 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -11,20 +8,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 import { useForm } from '@tanstack/react-form';
 import { clsx } from 'clsx';
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
 import {
-  User,
-  Phone,
+  CheckCircle2,
+  Clock,
+  Mail,
   MapPin,
   MessageSquare,
+  Phone,
   Send,
-  CheckCircle2,
-  Mail,
-  Clock,
+  User,
 } from 'lucide-react';
+import { motion } from 'motion/react';
+import React, { useState } from 'react';
 
 const FORM_FIELDS = [
   {
@@ -83,14 +84,14 @@ const contactInfo = [
   {
     icon: Phone,
     label: 'Hotline',
-    value: '0123 456 789',
-    href: 'tel:0123456789',
+    value: '078.6969.888',
+    href: 'tel:0786969888',
   },
   {
     icon: Mail,
     label: 'Email',
-    value: 'contact@fproduction.vn',
-    href: 'mailto:contact@fproduction.vn',
+    value: 'fproduction.work@gmail.com',
+    href: 'mailto:fproduction.work@gmail.com',
   },
   {
     icon: Clock,
@@ -233,7 +234,7 @@ export default function ContactForm() {
             transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
             className="lg:col-span-3"
           >
-            <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-xl shadow-gray-100/50 md:p-8">
+            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-md md:p-8">
               <div className="flex flex-col gap-5">
                 {FORM_FIELDS.map((fieldConfig, index) => (
                   <motion.div
@@ -253,33 +254,36 @@ export default function ContactForm() {
                         <div className="flex flex-col gap-2">
                           <div
                             className={clsx(
-                              'group flex gap-3 rounded-2xl border-2 bg-gray-50/50 p-4 transition-all duration-300',
+                              'group border-red flex flex-col gap-2 rounded-2xl border-2 border-gray-200 bg-gray-50/50 p-4 transition-all duration-300',
                               field.state.meta.errors.length > 0
                                 ? 'border-red-300 bg-red-50/30'
-                                : 'border-transparent hover:border-gray-200 focus-within:border-background-secondary focus-within:bg-white'
+                                : 'focus-within:border-background-secondary focus-within:bg-white'
                             )}
                           >
-                            <div className="mt-0.5">
+                            <div className="flex gap-2">
                               <fieldConfig.icon
                                 className={clsx(
                                   'h-5 w-5 transition-colors duration-300',
                                   field.state.meta.errors.length > 0
                                     ? 'text-red-400'
-                                    : 'text-gray-400 group-focus-within:text-background-secondary'
+                                    : 'group-focus-within:text-background-secondary text-gray-400'
                                 )}
                               />
-                            </div>
-                            <div className="flex-1">
                               <Label
                                 htmlFor={field.name}
-                                className="mb-1.5 flex items-center gap-1 text-sm font-medium text-gray-700"
+                                className={cn(
+                                  'group-focus-within:text-background-secondary mb-1.5 flex items-center gap-1 text-sm font-medium text-gray-700',
+                                  field.state.meta.errors.length > 0 &&
+                                    'text-red-400 group-focus-within:text-red-400'
+                                )}
                               >
                                 {fieldConfig.label}
                                 {fieldConfig.required !== false && (
                                   <span className="text-red-500">*</span>
                                 )}
                               </Label>
-
+                            </div>
+                            <div className="flex-1">
                               {fieldConfig.type === 'textarea' ? (
                                 <Textarea
                                   id={field.name}
@@ -313,7 +317,7 @@ export default function ContactForm() {
                             <motion.p
                               initial={{ opacity: 0, y: -5 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="ml-12 text-xs text-red-500"
+                              className="text-xs text-red-500"
                             >
                               {field.state.meta.errors[0]}
                             </motion.p>
@@ -367,7 +371,7 @@ export default function ContactForm() {
 
       {/* Success Dialog */}
       <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white border-gray-200">
+        <DialogContent className="border-gray-200 bg-white sm:max-w-md">
           <DialogHeader>
             <div className="flex flex-col items-center space-y-4 py-4 text-center">
               <motion.div

@@ -1,10 +1,8 @@
-import ContactForm from "@/components/contact/contact-form";
-import HeroSection from "@/components/layout/hero-section";
+import ContactForm from '@/components/contact/contact-form';
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen">
-      <HeroSection />
+    <main className="mt-16 min-h-screen">
       <ContactForm />
     </main>
   );
