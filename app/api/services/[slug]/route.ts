@@ -2,21 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPublicUrl } from "@/lib/s3";
 
-// Mapping từ slug (URL) sang service name (database)
-const SLUG_SERVICE_MAP: Record<string, string> = {
-    "chup-anh-su-kien": "Chụp Ảnh Sự Kiện",
-    "quay-phim-su-kien": "Quay Phim Sự Kiện",
-    "livestream-chuyen-nghiep": "Livestream Chuyên Nghiệp",
-    "livestream-su-kien": "Livestream Sự Kiện",
-    "tvc-phim-doanh-nghiep": "TVC - Phim Doanh Nghiệp",
-    "chup-anh-profile-tap-the": "Chụp Ảnh Profile, Tập Thể",
-    "chup-anh-profile": "Chụp Ảnh Profile Chuyên Nghiệp",
-    "quay-phim-podcast": "Quay Phim Podcast",
-    "chup-anh-kien-truc": "Chụp Ảnh Kiến Trúc",
-    "quay-phim-kien-truc": "Quay Phim Kiến Trúc",
-    "truyen-thong-bao-chi": "Truyền Thông Báo Chí",
-};
-
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ slug: string }> }
@@ -24,26 +9,9 @@ export async function GET(
     try {
         const { slug } = await params;
 
-        // Chuyển đổi slug sang service name
-        const serviceName = SLUG_SERVICE_MAP[slug];
-
-        if (!serviceName) {
-            return NextResponse.json({
-                success: false,
-                message: `Không tìm thấy service với slug "${slug}"`,
-                events: [],
-                hasContent: false,
-            });
-        }
-
-        // Tìm service theo name
-        const service = await prisma.service.findFirst({
-            where: {
-                name: {
-                    equals: serviceName,
-                    mode: "insensitive",
-                },
-            },
+        // Tìm service trực tiếp theo slug
+        const service = await prisma.service.findUnique({
+            where: { slug },
         });
 
         if (!service) {
@@ -51,7 +19,7 @@ export async function GET(
                 success: true,
                 events: [],
                 hasContent: false,
-                message: `Service "${serviceName}" chưa được tạo trong database`,
+                message: `Service với slug "${slug}" chưa được tạo trong database`,
             });
         }
 
@@ -67,20 +35,28 @@ export async function GET(
             });
         }
 
-        // Query các events với images và videos
+        // Xác định media type dựa trên slug
+        const mediaType = slug.startsWith("chup-anh") ? "image" : "video";
+
+        // Query các events với images hoặc videos tùy media type
         const events = await prisma.event.findMany({
             where: {
                 id: { in: eventIds },
             },
             include: {
-                images: {
-                    where: { showOnLanding: true },
-                    orderBy: { createdAt: "desc" },
-                },
-                videos: {
-                    where: { showOnLanding: true },
-                    orderBy: { createdAt: "desc" },
-                },
+                ...(mediaType === "image"
+                    ? {
+                        images: {
+                            where: { showOnLanding: true },
+                            orderBy: { createdAt: "desc" as const },
+                        },
+                    }
+                    : {
+                        videos: {
+                            where: { showOnLanding: true },
+                            orderBy: { createdAt: "desc" as const },
+                        },
+                    }),
             },
         });
 
@@ -91,31 +67,28 @@ export async function GET(
 
         // Transform data để trả về frontend
         const transformedEvents = orderedEvents
-            .filter((event) => event.images.length > 0 || event.videos.length > 0)
             .map((event) => ({
                 id: event.id,
                 title: event.title,
                 client: event.client,
                 place: event.place,
-                products: [
-                    // Videos trước (nếu có)
-                    ...event.videos.map((video) => ({
+                products: mediaType === "video"
+                    ? ("videos" in event ? (event.videos as Array<{ id: string; title: string | null; thumbnail: string | null; youtubeUrl: string | null }>) : []).map((video) => ({
                         id: video.id,
                         type: "video" as const,
                         title: video.title,
                         thumbnail: video.thumbnail,
                         youtubeUrl: video.youtubeUrl,
-                    })),
-                    // Rồi đến Images
-                    ...event.images.map((image) => ({
+                    }))
+                    : ("images" in event ? (event.images as Array<{ id: string; title: string | null; s3Key: string; format: string | null }>) : []).map((image) => ({
                         id: image.id,
                         type: "image" as const,
                         title: image.title,
                         url: getPublicUrl(image.s3Key),
                         format: image.format,
                     })),
-                ],
-            }));
+            }))
+            .filter((event) => event.products.length > 0);
 
         const hasContent = transformedEvents.some((e) => e.products.length > 0);
 
@@ -123,9 +96,11 @@ export async function GET(
             success: true,
             events: transformedEvents,
             hasContent,
+            mediaType,
             service: {
                 id: service.id,
                 name: service.name,
+                slug: service.slug,
             },
         });
     } catch (error) {

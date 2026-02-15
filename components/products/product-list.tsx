@@ -1,35 +1,39 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useCallback, useEffect, useState } from 'react';
 
 import ProductFilterSection from '@/components/products/product-filter-section';
 import ProductItem from '@/components/products/product-item';
 import ProductView from '@/components/products/product-view';
 
-// Mapping từ filter type sang service name
+// Mapping từ filter type sang service slug
 // Chỉ filter có trong map này mới fetch từ API
-const FILTER_SERVICE_MAP: Record<string, string> = {
-  Livestream: 'Livestream chuyên nghiệp',
-  'Ảnh sự kiện': 'Chụp ảnh sự kiện',
-  'Video sự kiện': 'Quay phim sự kiện',
-  TVC: 'TVC - Phim Doanh Nghiệp',
-  'Ảnh Profile': 'Chụp ảnh Profile, tập thể',
-  Podcast: 'Quay phim Podcast',
-  'Ảnh Kiến trúc': 'Chụp ảnh kiến trúc',
-  'Video Kiến trúc': 'Quay phim kiến trúc',
-  'Đăng Báo chí': 'Truyền thông Báo chí',
+const FILTER_SERVICE_SLUG_MAP: Record<string, string> = {
+  Livestream: 'livestream-chuyen-nghiep',
+  'Ảnh sự kiện': 'chup-anh-su-kien',
+  'Video sự kiện': 'quay-phim-su-kien',
+  TVC: 'tvc-phim-doanh-nghiep',
+  'Ảnh Profile': 'chup-anh-profile-tap-the',
+  Podcast: 'quay-phim-podcast',
+  'Ảnh Kiến trúc': 'chup-anh-kien-truc',
+  'Video Kiến trúc': 'quay-phim-kien-truc',
+  'Đăng Báo chí': 'truyen-thong-bao-chi',
 };
 
-type LandingImage = {
+type LandingProduct = {
   id: string;
   title: string | null;
-  format: string | null;
-  url: string | null;
-  publicId: string | null;
+  type: 'image' | 'video';
+  // Image fields
+  format?: string | null;
+  url?: string | null;
+  s3Key?: string | null;
+  // Video fields
+  youtubeUrl?: string | null;
+  thumbnail?: string | null;
   createdAt: string;
   updatedAt: string;
-  type: 'image';
   event: {
     id: string;
     title: string;
@@ -87,19 +91,19 @@ const ProductList = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>('Livestream');
   const [activeProductView, setActiveProductView] = useState<boolean>(false);
   const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
-  
+
   // State for API fetched data
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
 
-  // Fetch images from API
-  const fetchImages = useCallback(async (filterType: string, pageNum: number, append = false) => {
-    const serviceName = FILTER_SERVICE_MAP[filterType];
-    
+  // Fetch products from API (images or videos depending on service type)
+  const fetchProducts = useCallback(async (filterType: string, pageNum: number, append = false) => {
+    const serviceSlug = FILTER_SERVICE_SLUG_MAP[filterType];
+
     // Nếu filter không có trong map, sử dụng placeholder data
-    if (!serviceName) {
+    if (!serviceSlug) {
       const placeholderData: ProductItem[] = Array.from({ length: 6 }, (_, i) => ({
         id: `placeholder-${i}`,
         type: 'image' as const,
@@ -114,7 +118,7 @@ const ProductList = () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
-        serviceName,
+        serviceSlug,
         page: pageNum.toString(),
         limit: ITEMS_PER_PAGE.toString(),
       });
@@ -123,29 +127,30 @@ const ProductList = () => {
       const data = await response.json();
 
       if (data.success) {
-        const newImages: ProductItem[] = data.images.map((img: LandingImage) => ({
-          id: img.id,
-          type: 'image' as const,
-          title: img.title,
-          format: img.format,
-          url: img.url,
-          publicId: img.publicId,
-          eventName: img.event.title,
-          eventClient: img.event.client,
-          createdAt: new Date(img.createdAt),
-          updatedAt: new Date(img.updatedAt),
+        const newProducts: ProductItem[] = data.products.map((item: LandingProduct) => ({
+          id: item.id,
+          type: item.type,
+          title: item.title,
+          format: item.format,
+          url: item.url,
+          youtubeUrl: item.youtubeUrl,
+          thumbnail: item.thumbnail,
+          eventName: item.event.title,
+          eventClient: item.event.client,
+          createdAt: new Date(item.createdAt),
+          updatedAt: new Date(item.updatedAt),
         }));
 
         if (append) {
-          setProducts((prev) => [...prev, ...newImages]);
+          setProducts((prev) => [...prev, ...newProducts]);
         } else {
-          setProducts(newImages);
+          setProducts(newProducts);
         }
-        
+
         setHasMore(data.pagination.hasMore);
       }
     } catch (error) {
-      console.error('Error fetching images:', error);
+      console.error('Error fetching products:', error);
     } finally {
       setIsLoading(false);
     }
@@ -154,8 +159,8 @@ const ProductList = () => {
   // Fetch on filter change
   useEffect(() => {
     setPage(1);
-    fetchImages(selectedFilter, 1, false);
-  }, [selectedFilter, fetchImages]);
+    fetchProducts(selectedFilter, 1, false);
+  }, [selectedFilter, fetchProducts]);
 
   const handleFilterType = (type: string) => {
     if (type !== selectedFilter) {
@@ -171,7 +176,7 @@ const ProductList = () => {
   const handleLoadMoreProduct = () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchImages(selectedFilter, nextPage, true);
+    fetchProducts(selectedFilter, nextPage, true);
   };
 
   // Convert products to ProductView format
@@ -214,10 +219,33 @@ const ProductList = () => {
               handleFilterType={handleFilterType}
             />
           </motion.div>
-          
+
           {isLoading && products.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-[#1B1B1B]" />
+            </div>
+          ) : !isLoading && products.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-background h-16 w-16"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <p className="text-background text-lg font-medium">
+                Chưa có sản phẩm nào
+              </p>
+              <p className="text-sm text-gray-400">
+                Sản phẩm sẽ được cập nhật sớm nhất
+              </p>
             </div>
           ) : (
             <motion.div
@@ -244,16 +272,18 @@ const ProductList = () => {
                   >
                     <ProductItem
                       type={product.type}
-                      handleActiveProductView={() => handleActiveProductView(index)}
+                      handleActiveProductView={() =>
+                        handleActiveProductView(index)
+                      }
                       image={
                         product.publicId || product.url
                           ? {
-                              id: product.id,
-                              publicId: product.publicId,
-                              url: product.url,
-                              title: product.title,
-                              format: product.format,
-                            }
+                            id: product.id,
+                            publicId: product.publicId,
+                            url: product.url,
+                            title: product.title,
+                            format: product.format,
+                          }
                           : undefined
                       }
                       eventName={product.eventName}
@@ -265,7 +295,7 @@ const ProductList = () => {
             </motion.div>
           )}
         </div>
-        
+
         {hasMore && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -281,7 +311,7 @@ const ProductList = () => {
           </motion.div>
         )}
       </div>
-      
+
       {activeProductView && products.length > 0 && (
         <ProductView
           products={productViewItems}
@@ -294,4 +324,3 @@ const ProductList = () => {
 };
 
 export default ProductList;
-
