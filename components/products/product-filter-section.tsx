@@ -86,7 +86,7 @@ const ProductFilterSection = ({
           onMouseEnter={() => handleMouseEnter(index)}
           onMouseLeave={handleMouseLeave}
           className={clsx(
-            'relative z-10 min-w-[140px] cursor-pointer rounded-4xl px-4 py-2 text-center font-medium uppercase tracking-wide transition-colors duration-300 sm:text-base md:min-w-[150px] md:px-5 md:py-3 lg:text-lg',
+            'relative z-10 cursor-pointer rounded-4xl px-4 py-2 text-center font-medium tracking-wide uppercase transition-colors duration-300 sm:text-base md:px-5 md:py-3 lg:text-lg',
             activeIndex === index ? 'text-foreground' : 'text-[#1B1B1B]'
           )}
         >

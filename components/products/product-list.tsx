@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useCallback, useEffect, useState } from 'react';
 
 import ProductFilterSection from '@/components/products/product-filter-section';
 import ProductItem from '@/components/products/product-item';
@@ -224,6 +224,29 @@ const ProductList = () => {
             <div className="flex items-center justify-center py-12">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-[#1B1B1B]" />
             </div>
+          ) : !isLoading && products.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-background h-16 w-16"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <p className="text-background text-lg font-medium">
+                Chưa có sản phẩm nào
+              </p>
+              <p className="text-sm text-gray-400">
+                Sản phẩm sẽ được cập nhật sớm nhất
+              </p>
+            </div>
           ) : (
             <motion.div
               key={selectedFilter}
@@ -249,7 +272,9 @@ const ProductList = () => {
                   >
                     <ProductItem
                       type={product.type}
-                      handleActiveProductView={() => handleActiveProductView(index)}
+                      handleActiveProductView={() =>
+                        handleActiveProductView(index)
+                      }
                       image={
                         product.publicId || product.url
                           ? {
@@ -299,4 +324,3 @@ const ProductList = () => {
 };
 
 export default ProductList;
-
