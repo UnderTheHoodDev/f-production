@@ -288,6 +288,8 @@ const ProductList = () => {
                       }
                       eventName={product.eventName}
                       eventClient={product.eventClient || undefined}
+                      thumbnail={product.thumbnail || undefined}
+                      youtubeUrl={product.youtubeUrl || undefined}
                     />
                   </motion.div>
                 ))}

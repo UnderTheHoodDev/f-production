@@ -1,6 +1,8 @@
 import { Play } from 'lucide-react';
 import Image from 'next/image';
 
+import { getYouTubeVideoId } from '@/utils/youtube';
+
 export type ProductImage = {
   id: string;
   publicId?: string | null;
@@ -16,6 +18,7 @@ interface ProductItemProps {
   eventName?: string;
   eventClient?: string;
   thumbnail?: string; // For video thumbnails
+  youtubeUrl?: string; // For generating thumbnail from YouTube URL
 }
 
 const ProductItem = ({
@@ -25,8 +28,11 @@ const ProductItem = ({
   eventName,
   eventClient,
   thumbnail,
+  youtubeUrl,
 }: ProductItemProps) => {
-  const imageUrl = image?.url || thumbnail;
+  const videoId = getYouTubeVideoId(youtubeUrl || null);
+  const thumbnailUrl = thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null);
+  const imageUrl = image?.url || thumbnailUrl;
 
   return (
     <div
@@ -41,18 +47,26 @@ const ProductItem = ({
           alt="Logo copyright"
           className="absolute top-1 left-2 opacity-40 z-10"
         />
-        <Image
-          src={imageUrl || 'https://img.youtube.com/vi/LIKOvbJ-DZg/maxresdefault.jpg'}
-          width={480}
-          height={270}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
-          loading="lazy"
-          className="aspect-video max-h-60 w-full object-cover"
-          alt={image?.title || eventName || 'Product image'}
-        />
-        {type === 'video' && (
-          <div className="border-foreground absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 p-2">
-            <Play className="text-foreground fill-foreground h-5 w-5" />
+        {imageUrl ? (
+          <>
+            <Image
+              src={imageUrl}
+              width={480}
+              height={270}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
+              loading="lazy"
+              className="aspect-video max-h-60 w-full object-cover"
+              alt={image?.title || eventName || 'Product image'}
+            />
+            {type === 'video' && (
+              <div className="border-foreground absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 p-2">
+                <Play className="text-foreground fill-foreground h-5 w-5" />
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="aspect-video max-h-60 w-full bg-gray-200 flex items-center justify-center">
+            <Play className="h-12 w-12 text-gray-400" />
           </div>
         )}
       </div>
