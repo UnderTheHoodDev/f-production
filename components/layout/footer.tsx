@@ -1,7 +1,6 @@
 import { Facebook, Instagram, Mail, Phone, Youtube } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { title } from 'process';
 
 const Footer = () => {
   const footerLinks = [
@@ -11,31 +10,29 @@ const Footer = () => {
         { title: 'Trang chủ', url: '/' },
         { title: 'Giới thiệu', url: '/gioi-thieu' },
         { title: 'Liên hệ', url: '/lien-he' },
-        { title: 'Hướng dẫn thanh toán', url: '#' },
-        { title: 'Chính sách bảo mật', url: '#' },
       ],
     },
     {
       label: 'Dịch vụ',
       links: [
         {
-          title: 'Livestream chuyên nghiệp',
+          title: 'Livestream Chuyên Nghiệp',
           url: '/dich-vu/livestream-chuyen-nghiep',
         },
-        { title: 'Chụp ảnh sự kiện', url: '/dich-vu/chup-anh-su-kien' },
-        { title: 'Quay phim sự kiện', url: '/dich-vu/quay-phim-su-kien' },
+        { title: 'Chụp Ảnh Sự Kiện', url: '/dich-vu/chup-anh-su-kien' },
+        { title: 'Quay Phim Sự Kiện', url: '/dich-vu/quay-phim-su-kien' },
         {
-          title: 'TVC - Phim doanh nghiệp',
+          title: 'TVC - Phim Doanh Nghiệp',
           url: '/dich-vu/tvc-phim-doanh-nghiep',
         },
         {
-          title: 'Chụp ảnh Profile, tập thể',
+          title: 'Chụp Ảnh Profile, Tập Thể',
           url: '/dich-vu/chup-anh-profile-tap-the',
         },
-        { title: 'Quay phim Podcast', url: '/dich-vu/quay-phim-podcast' },
-        { title: 'Chụp ảnh kiến trúc', url: '/dich-vu/chup-anh-kien-truc' },
-        { title: 'Quay phim kiến trúc', url: '/dich-vu/quay-phim-kien-truc' },
-        { title: 'Truyền thông Báo chí', url: '/dich-vu/truyen-thong-bao-chi' },
+        { title: 'Quay Phim Podcast', url: '/dich-vu/quay-phim-podcast' },
+        { title: 'Chụp Ảnh Kiến Trúc', url: '/dich-vu/chup-anh-kien-truc' },
+        { title: 'Quay Phim Kiến Trúc', url: '/dich-vu/quay-phim-kien-truc' },
+        { title: 'Truyền Thông Báo Chí', url: '/dich-vu/truyen-thong-bao-chi' },
       ],
     },
     {
@@ -69,12 +66,13 @@ const Footer = () => {
               return (
                 <div
                   key={section.label}
-                  className="flex w-full flex-col flex-wrap gap-2 sm:gap-3 md:w-[calc(33%-8px)] lg:w-fit"
+                  className="flex w-full flex-col gap-2 sm:gap-3 md:w-[calc(33%-8px)] lg:w-fit"
                 >
-                  <span className="text-primary text-lg font-medium md:text-xl">
+                  <span className="text-primary text-base font-semibold tracking-wider uppercase md:text-lg">
                     {section.label}
                   </span>
-                  <div className="flex flex-col gap-2">
+                  <div className="bg-primary h-0.5 w-8 rounded-full" />
+                  <div className="mt-1 flex flex-col gap-2">
                     {section.contents?.map((content, index) => (
                       <div
                         key={index}
@@ -94,10 +92,11 @@ const Footer = () => {
                 key={section.label}
                 className="xsm:w-[calc(50%-12px)] flex w-full flex-col gap-2 sm:w-[calc(50%-12px)] sm:gap-3 md:w-[calc(33.33%-20px)] lg:w-fit"
               >
-                <span className="text-primary text-base font-medium md:text-xl">
+                <span className="text-primary text-base font-semibold tracking-wider uppercase md:text-lg">
                   {section.label}
                 </span>
-                <div className="flex flex-col gap-2 text-sm">
+                <div className="bg-primary h-0.5 w-8 rounded-full" />
+                <div className="mt-1 flex flex-col gap-2 text-sm">
                   {section.links?.map((link) => (
                     <Link
                       key={link.title}

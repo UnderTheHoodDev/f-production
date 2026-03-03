@@ -58,7 +58,7 @@ const ServiceList = () => {
                   y: -8,
                   transition: { duration: 0.3, ease: 'easeOut' },
                 }}
-                className="group bg-background-secondary flex h-full min-h-64 cursor-pointer flex-col items-center gap-3 rounded-2xl px-4 py-6 md:px-6 md:py-8"
+                className="group bg-background-secondary flex h-full min-h-[180px] cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl px-5 py-8 md:min-h-[200px] md:px-6 md:py-9 lg:min-h-[220px]"
               >
                 <motion.div
                   whileHover={{ rotate: 360 }}
@@ -67,12 +67,9 @@ const ServiceList = () => {
                 >
                   <Icon className="text-background size-7 sm:size-8 md:size-9 lg:size-10" />
                 </motion.div>
-                <span className="text-foreground group-hover:text-primary text-center text-lg font-bold transition-colors duration-300 md:text-[19px] lg:text-2xl">
+                <span className="text-foreground group-hover:text-primary max-w-[14ch] text-center text-lg leading-snug font-bold transition-colors duration-300 md:text-[19px] lg:text-2xl">
                   {service.label}
                 </span>
-                <p className="text-foreground text-center text-sm md:text-[15px] lg:mt-2 lg:text-base">
-                  {service.description}
-                </p>
               </motion.div>
             </Link>
           );

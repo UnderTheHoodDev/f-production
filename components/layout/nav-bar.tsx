@@ -67,7 +67,7 @@ const NavBar = () => {
     { label: 'Trang chủ', path: '/' },
     { label: 'Giới thiệu', path: '/gioi-thieu' },
     { label: 'Liên hệ', path: '/lien-he' },
-    { label: 'Bảng giá', path: '/bang-gia' },
+    // { label: 'Bảng giá', path: '/bang-gia' },
   ];
 
   const isServiceActive = pathname?.startsWith('/dich-vu');

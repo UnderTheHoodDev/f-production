@@ -34,6 +34,7 @@ const FORM_FIELDS = [
     placeholder: 'Điền họ và tên của bạn',
     type: 'input',
     icon: User,
+    required: true,
     validator: (value: string) =>
       !value ? 'Họ và tên là bắt buộc' : undefined,
   },
@@ -43,6 +44,7 @@ const FORM_FIELDS = [
     placeholder: 'Điền số điện thoại của bạn',
     type: 'input',
     icon: Phone,
+    required: true,
     validator: (value: string) => {
       if (!value) return 'Số điện thoại là bắt buộc';
       if (!/^[0-9]{10}$/.test(value.replace(/\s/g, ''))) {
@@ -57,18 +59,20 @@ const FORM_FIELDS = [
     placeholder: 'Điền địa chỉ của bạn',
     type: 'input',
     icon: MapPin,
-    required: false,
-    validator: () => undefined,
+    required: true,
+    validator: (value: string) =>
+      !value.trim() ? 'Địa chỉ là bắt buộc' : undefined,
   },
   {
     name: 'content' as const,
-    label: 'Nội dung',
+    label: 'Nội dung nhu cầu',
     placeholder: 'Mô tả nhu cầu của bạn...',
     type: 'textarea',
     rows: 4,
     icon: MessageSquare,
-    required: false,
-    validator: () => undefined,
+    required: true,
+    validator: (value: string) =>
+      !value.trim() ? 'Nội dung nhu cầu là bắt buộc' : undefined,
   },
 ];
 
@@ -96,7 +100,7 @@ const contactInfo = [
   {
     icon: Clock,
     label: 'Giờ làm việc',
-    value: '8:00 - 18:00 (T2 - T7)',
+    value: '8:00 - 23:00 (T2 - CN)',
     href: null,
   },
 ];
