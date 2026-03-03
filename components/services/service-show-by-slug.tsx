@@ -41,6 +41,7 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
   const [activeProductIndex, setActiveProductIndex] = useState(0);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const service = getServiceBySlug(slug);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -158,6 +159,24 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
   if (loading) {
     return (
       <>
+        {service && (
+          <div className="layout-padding pb-4 pt-8 md:pt-12 lg:pt-14">
+            <div className="flex flex-col gap-1">
+              <span className="text-primary/70 text-xs font-semibold uppercase tracking-widest">
+                Dịch vụ
+              </span>
+              <div>
+                <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl xl:text-5xl">
+                  {service.label}
+                </h1>
+                <div className="bg-primary mt-3 h-1 w-14 rounded-full" />
+              </div>
+              <p className="text-background-secondary/85 mt-2 max-w-2xl text-sm leading-relaxed md:text-base">
+                {service.description}
+              </p>
+            </div>
+          </div>
+        )}
         <div
           ref={containerRef}
           className="layout-padding mb-3 flex flex-col gap-4 py-6 md:py-10 lg:mb-4"
@@ -248,6 +267,7 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
                             : undefined
                         }
                         thumbnail={product.thumbnail || undefined}
+                        youtubeUrl={product.youtubeUrl || undefined}
                         eventName={event.title}
                         eventClient={event.client || undefined}
                       />
@@ -280,43 +300,48 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
   }
 
   if (events.length === 0) {
-    const service = getServiceBySlug(slug);
     if (!service) return null;
     const Icon = service.icon;
 
     return (
       <>
-        <section className="layout-padding py-8 sm:py-12 2xl:py-16">
-          <div className="mx-auto max-w-4xl">
-            <div className="flex flex-col items-center text-center">
-              <div className="bg-primary/30 text-primary mb-6 flex size-20 items-center justify-center rounded-2xl">
-                <Icon className="size-10" />
-              </div>
-              <h1 className="text-background mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
+        <div className="layout-padding pb-4 pt-8 md:pt-12 lg:pt-14">
+          <div className="flex flex-col gap-1">
+            <span className="text-primary/70 text-xs font-semibold uppercase tracking-widest">
+              Dịch vụ
+            </span>
+            <div>
+              <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl xl:text-5xl">
                 {service.label}
               </h1>
-              <p className="text-background-secondary max-w-2xl text-lg md:text-xl">
-                {service.description}
-              </p>
+              <div className="bg-primary mt-3 h-1 w-14 rounded-full" />
             </div>
+            <p className="text-background-secondary/85 mt-2 max-w-2xl text-sm leading-relaxed md:text-base">
+              {service.description}
+            </p>
           </div>
-        </section>
+        </div>
 
         <section className="layout-padding pb-8 sm:pb-12 2xl:pb-16">
           <div className="mx-auto max-w-4xl">
             <div className="bg-card rounded-2xl border p-8 md:p-12">
-              <div className="text-muted-foreground space-y-6 text-center">
-                <p className="text-lg">
-                  Nội dung chi tiết về dịch vụ{' '}
-                  <span className="text-primary font-semibold">
-                    {service.label}
-                  </span>{' '}
-                  sẽ được cập nhật.
-                </p>
-                <div className="bg-surface-alt mx-auto h-[1.5px] w-full" />
-                <p className="text-sm">
-                  Liên hệ với chúng tôi để biết thêm chi tiết về dịch vụ này.
-                </p>
+              <div className="flex flex-col items-center gap-6 text-center">
+                <div className="bg-primary/10 text-primary flex size-16 items-center justify-center rounded-2xl">
+                  <Icon className="size-8" />
+                </div>
+                <div className="text-muted-foreground space-y-3">
+                  <p className="text-base">
+                    Nội dung chi tiết về dịch vụ{' '}
+                    <span className="text-primary font-semibold">
+                      {service.label}
+                    </span>{' '}
+                    sẽ được cập nhật.
+                  </p>
+                  <div className="bg-surface-alt mx-auto h-[1.5px] w-full" />
+                  <p className="text-sm">
+                    Liên hệ với chúng tôi để biết thêm chi tiết về dịch vụ này.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -327,6 +352,24 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
 
   return (
     <>
+      {service && (
+        <div className="layout-padding pb-4 pt-8 md:pt-12 lg:pt-14">
+          <div className="flex flex-col gap-1">
+            <span className="text-primary/70 text-xs font-semibold uppercase tracking-widest">
+              Dịch vụ
+            </span>
+            <div>
+              <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl xl:text-5xl">
+                {service.label}
+              </h1>
+              <div className="bg-primary mt-3 h-1 w-14 rounded-full" />
+            </div>
+            <p className="text-background-secondary/85 mt-2 max-w-2xl text-sm leading-relaxed md:text-base">
+              {service.description}
+            </p>
+          </div>
+        </div>
+      )}
       <div
         ref={containerRef}
         className="layout-padding mb-3 flex flex-col gap-4 py-6 md:py-10 lg:mb-4"
@@ -417,6 +460,7 @@ const ServiceShowBySlug = ({ slug }: ServiceShowBySlugProps) => {
                           : undefined
                       }
                       thumbnail={product.thumbnail || undefined}
+                      youtubeUrl={product.youtubeUrl || undefined}
                       eventName={event.title}
                       eventClient={event.client || undefined}
                     />

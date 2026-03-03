@@ -80,7 +80,7 @@ const OurPartners = () => {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="text-foreground xsm:text-3xl text-center text-2xl font-bold lg:text-4xl"
       >
-        Các đối tác của chúng tôi
+        Đối tác
       </motion.span>
       <motion.div
         initial="hidden"

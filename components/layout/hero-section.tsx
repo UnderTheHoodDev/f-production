@@ -46,7 +46,7 @@ const HeroSection = () => {
                     .getElementById('dich-vu')
                     ?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="text-foreground border-foreground cursor-pointer rounded-4xl border-2 px-3 py-2 text-base/8 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg"
+                className="text-foreground border-foreground hover:text-background hover:bg-foreground focus-visible:ring-foreground/40 cursor-pointer rounded-4xl border-2 px-3 py-2 text-base/8 font-medium shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 md:px-5 md:text-lg"
               >
                 Dịch vụ & Sản phẩm
               </Link>
@@ -58,7 +58,7 @@ const HeroSection = () => {
             >
               <Link
                 href="/lien-he"
-                className="border-primary bg-primary text-background rounded-4xl border-2 px-3 py-2 text-base/8 font-medium transition-all duration-300 hover:scale-105 md:px-5 md:text-lg"
+                className="border-primary bg-primary text-background hover:bg-primary/90 focus-visible:ring-primary/40 rounded-4xl border-2 px-3 py-2 text-base/8 font-medium shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 md:px-5 md:text-lg"
               >
                 Đặt lịch
               </Link>
