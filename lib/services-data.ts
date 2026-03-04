@@ -2,12 +2,12 @@ import {
   Building2,
   Camera,
   Clapperboard,
-  Video,
-  Radio,
   Film,
-  UserCircle,
   Mic,
   Newspaper,
+  Radio,
+  UserCircle,
+  Video,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -44,8 +44,8 @@ export const services: Service[] = [
     description: 'Sản xuất TVC và phim giới thiệu doanh nghiệp',
   },
   {
-    label: 'Chụp Ảnh Profile, Tập Thể',
-    slug: 'chup-anh-profile-tap-the',
+    label: 'Chụp Ảnh Profile',
+    slug: 'chup-anh-profile',
     icon: UserCircle,
     description: 'Chụp ảnh profile cá nhân, tập thể và doanh nghiệp',
   },

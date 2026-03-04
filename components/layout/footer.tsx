@@ -26,7 +26,7 @@ const Footer = () => {
           url: '/dich-vu/tvc-phim-doanh-nghiep',
         },
         {
-          title: 'Chụp Ảnh Profile, Tập Thể',
+          title: 'Chụp Ảnh Profile',
           url: '/dich-vu/chup-anh-profile-tap-the',
         },
         { title: 'Quay Phim Podcast', url: '/dich-vu/quay-phim-podcast' },
