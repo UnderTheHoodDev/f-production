@@ -1,10 +1,16 @@
 'use client';
-
-import { getPublicUrl } from '@/lib/s3';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 
+import { useIsMobile } from '@/hooks/use-mobile';
+import { getPublicUrl } from '@/lib/s3';
+
 const HeroSection = () => {
+  const isMobile = useIsMobile();
+  const videoSrc = isMobile
+    ? getPublicUrl('videos/header_mobile.mp4')
+    : getPublicUrl('videos/header.mp4');
+
   return (
     <>
       <div className="relative mt-16 h-140 w-full sm:mt-0 sm:h-150 md:h-160 lg:min-h-screen">
@@ -13,20 +19,12 @@ const HeroSection = () => {
           autoPlay
           loop
           playsInline
+          key={videoSrc}
           className="absolute h-full w-full object-cover"
         >
-          <source
-            src={getPublicUrl('videos/header_mobile.mp4')}
-            media="(max-width: 767px)"
-            type="video/mp4"
-          />
-          <source
-            src={getPublicUrl('videos/header.mp4')}
-            media="(min-width: 768px)"
-            type="video/mp4"
-          />
+          <source src={videoSrc} type="video/mp4" />
         </video>
-        <div className="layout-padding absolute bottom-[30%] z-0 flex w-full -translate-y-1/4 flex-col gap-6 md:top-1/4 md:translate-y-1/2">
+        <div className="layout-padding xsm:bottom-15 m: absolute bottom-1/5 z-0 flex w-full -translate-y-1/4 flex-col gap-6 sm:bottom-1/10 md:top-1/4 md:translate-y-1/2">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -46,7 +44,7 @@ const HeroSection = () => {
                     .getElementById('dich-vu')
                     ?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="text-foreground border-foreground hover:text-background hover:bg-foreground focus-visible:ring-foreground/40 cursor-pointer rounded-4xl border-2 px-3 py-2 text-base/8 font-medium shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 md:px-5 md:text-lg"
+                className="text-foreground border-foreground hover:text-background hover:bg-foreground focus-visible:ring-foreground/40 cursor-pointer rounded-4xl border-2 px-3 py-2 text-base/8 font-medium shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-md focus-visible:ring-2 focus-visible:outline-none md:px-5 md:text-lg"
               >
                 Dịch vụ & Sản phẩm
               </Link>
@@ -58,7 +56,7 @@ const HeroSection = () => {
             >
               <Link
                 href="/lien-he"
-                className="border-primary bg-primary text-background hover:bg-primary/90 focus-visible:ring-primary/40 rounded-4xl border-2 px-3 py-2 text-base/8 font-medium shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 md:px-5 md:text-lg"
+                className="border-primary bg-primary text-background hover:bg-primary/90 focus-visible:ring-primary/40 rounded-4xl border-2 px-3 py-2 text-base/8 font-medium shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-md focus-visible:ring-2 focus-visible:outline-none md:px-5 md:text-lg"
               >
                 Đặt lịch
               </Link>
