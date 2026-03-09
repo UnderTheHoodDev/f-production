@@ -23,9 +23,26 @@ export async function generateMetadata({ params }: ServicePageProps) {
     };
   }
 
+  const title = `${service.label} | F Production`;
+  const description = `${service.description}. Dịch vụ ${service.label.toLowerCase()} chuyên nghiệp tại F.Production.`;
+
   return {
-    title: `${service.label} | F Production`,
-    description: service.description,
+    title: service.label,
+    description,
+    alternates: {
+      canonical: `/dich-vu/${slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `/dich-vu/${slug}`,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   };
 }
 
