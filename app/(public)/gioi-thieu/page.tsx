@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import AboutPage from '@/components/about/about-page';
 
 export const metadata: Metadata = {
-  title: 'Giới thiệu | F Production',
+  title: 'Giới thiệu',
   description:
     'Tìm hiểu về F.Production - đơn vị chuyên cung cấp dịch vụ quay phim, chụp ảnh và truyền thông chuyên nghiệp. Đội ngũ sáng tạo, tận tâm và giàu kinh nghiệm.',
   alternates: {
