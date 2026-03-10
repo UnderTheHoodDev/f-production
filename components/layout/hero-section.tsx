@@ -24,7 +24,7 @@ const HeroSection = () => {
         >
           <source src={videoSrc} type="video/mp4" />
         </video>
-        <div className="layout-padding xsm:bottom-15 absolute z-0 flex w-full -translate-y-1/4 flex-col gap-6 sm:bottom-1/10 md:top-1/5 md:bottom-1/5 md:translate-y-1/2">
+        <div className="layout-padding xsm:bottom-15 absolute bottom-1/5 z-0 flex w-full -translate-y-1/4 flex-col gap-6 sm:bottom-1/10 md:top-1/7 md:translate-y-1/2">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
