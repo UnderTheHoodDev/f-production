@@ -18,6 +18,9 @@ import {
 import { prisma } from "@/lib/prisma";
 import { ServicesPageClient } from "@/components/services/services-page-client";
 
+// Always fetch fresh data; avoid static cache so new events appear immediately.
+export const revalidate = 0;
+
 export default async function ServicesPage() {
   const services = await prisma.service.findMany({
     orderBy: { createdAt: "desc" },

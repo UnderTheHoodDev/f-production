@@ -18,6 +18,9 @@ import { prisma } from "@/lib/prisma"
 import { getPublicUrl } from "@/lib/s3"
 import { PartnersPageClient } from "@/components/partners/partners-page-client"
 
+// Avoid cached data; always fetch latest partners
+export const revalidate = 0
+
 export default async function PartnersPage() {
     const partners = await prisma.partner.findMany({
         orderBy: { order: "asc" },
