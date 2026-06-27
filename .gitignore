@@ -12,6 +12,12 @@
 
 # testing
 /coverage
+/test-results
+/playwright-report
+/e2e/.auth
+
+# local reference samples (not committed)
+/Bao gia*
 
 # next.js
 /.next/

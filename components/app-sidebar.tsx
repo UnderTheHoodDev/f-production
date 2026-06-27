@@ -4,6 +4,7 @@ import Image from "next/image";
 import * as React from "react";
 import {
   CalendarClock,
+  FileText,
   Handshake,
   Images,
   LayoutDashboard,
@@ -51,6 +52,11 @@ const data = {
       title: "Dịch vụ",
       url: "/admin/services",
       icon: Handshake,
+    },
+    {
+      title: "Báo giá",
+      url: "/admin/quotes",
+      icon: FileText,
     },
     {
       title: "Đối tác",

@@ -86,3 +86,48 @@ model Partner {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  VIEWED
+  RESPONDED
+}
+
+model Quote {
+  id          String      @id @default(uuid())
+  seq         Int         @unique @default(autoincrement()) // atomic counter for quoteNumber
+  quoteNumber String      @unique // "BG-0059" = "BG-" + pad(seq, 4)
+  token       String      @unique // public unguessable slug, e.g. "83ZRHCW"
+
+  recipientName String
+  status        QuoteStatus @default(DRAFT)
+
+  // money — VND, integer (no decimals). Decimal(14,0) avoids Int4 overflow (~2.1B cap)
+  subtotal  Decimal @db.Decimal(14, 0)
+  discount  Decimal @default(0) @db.Decimal(14, 0)
+  taxRate   Decimal @default(8) @db.Decimal(5, 2) // percent, e.g. 8.00
+  taxAmount Decimal @db.Decimal(14, 0)
+  total     Decimal @db.Decimal(14, 0)
+
+  issueDate  DateTime  @db.Date
+  validUntil DateTime? @db.Date
+
+  // full nested document: sections[]->items[], blocks[], company snapshot, representative, feedback config
+  content Json
+
+  // customer response (price feedback on the public portal)
+  customerFeedback String? // label of the option the customer picked
+  feedbackComment  String? // optional free text, stored plain, rendered escaped
+  respondedAt      DateTime?
+  viewedAt         DateTime?
+  respondentIp     String?
+
+  representativeKey String? // S3 key of the issuer's signature image
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}

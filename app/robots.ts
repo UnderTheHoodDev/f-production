@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/', '/api/', '/login/'],
+        disallow: ['/admin/', '/api/', '/login/', '/q/'],
       },
     ],
     sitemap: 'https://fproduction.vn/sitemap.xml',
