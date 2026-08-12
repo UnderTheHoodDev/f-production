@@ -2,6 +2,8 @@ import { Facebook, Instagram, Mail, Phone, Youtube } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { services } from '@/lib/services-data';
+
 const Footer = () => {
   const footerLinks = [
     {
@@ -14,26 +16,10 @@ const Footer = () => {
     },
     {
       label: 'Dịch vụ',
-      links: [
-        {
-          title: 'Livestream Chuyên Nghiệp',
-          url: '/dich-vu/livestream-chuyen-nghiep',
-        },
-        { title: 'Chụp Ảnh Sự Kiện', url: '/dich-vu/chup-anh-su-kien' },
-        { title: 'Quay Phim Sự Kiện', url: '/dich-vu/quay-phim-su-kien' },
-        {
-          title: 'TVC - Phim Doanh Nghiệp',
-          url: '/dich-vu/tvc-phim-doanh-nghiep',
-        },
-        {
-          title: 'Chụp Ảnh Profile',
-          url: '/dich-vu/chup-anh-profile-tap-the',
-        },
-        { title: 'Quay Phim Podcast', url: '/dich-vu/quay-phim-podcast' },
-        { title: 'Chụp Ảnh Kiến Trúc', url: '/dich-vu/chup-anh-kien-truc' },
-        { title: 'Quay Phim Kiến Trúc', url: '/dich-vu/quay-phim-kien-truc' },
-        { title: 'Truyền Thông Báo Chí', url: '/dich-vu/truyen-thong-bao-chi' },
-      ],
+      links: services.map((service) => ({
+        title: service.label,
+        url: `/dich-vu/${service.slug}`,
+      })),
     },
     {
       label: 'Liên hệ',

@@ -2,26 +2,16 @@ import clsx from 'clsx';
 import { useLayoutEffect, useRef, useState } from 'react';
 
 interface FilterSectionProps {
+  filterTypes: string[];
   handleFilterType: (type: string) => void;
   selectedFilter: string;
 }
 
 const ProductFilterSection = ({
+  filterTypes,
   handleFilterType,
   selectedFilter,
 }: FilterSectionProps) => {
-  const filterTypes = [
-    'Livestream',
-    'Ảnh sự kiện',
-    'Video sự kiện',
-    'TVC',
-    'Ảnh Profile',
-    'Podcast',
-    'Ảnh Kiến trúc',
-    'Video Kiến trúc',
-    'Đăng Báo chí',
-  ];
-
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 

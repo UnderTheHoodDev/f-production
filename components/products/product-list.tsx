@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import ProductFilterSection from '@/components/products/product-filter-section';
 import ProductItem from '@/components/products/product-item';
 import ProductView from '@/components/products/product-view';
+import { hiddenServiceSlugs } from '@/lib/services-data';
 
 // Mapping từ filter type sang service slug
 // Chỉ filter có trong map này mới fetch từ API
@@ -20,6 +21,11 @@ const FILTER_SERVICE_SLUG_MAP: Record<string, string> = {
   'Video Kiến trúc': 'quay-phim-kien-truc',
   'Đăng Báo chí': 'truyen-thong-bao-chi',
 };
+
+// Ẩn tab của những dịch vụ đã tắt trong services-data
+const FILTER_TYPES = Object.keys(FILTER_SERVICE_SLUG_MAP).filter(
+  (type) => !hiddenServiceSlugs.has(FILTER_SERVICE_SLUG_MAP[type])
+);
 
 type LandingProduct = {
   id: string;
@@ -88,7 +94,9 @@ const itemVariants = {
 const ITEMS_PER_PAGE = 6;
 
 const ProductList = () => {
-  const [selectedFilter, setSelectedFilter] = useState<string>('Livestream');
+  const [selectedFilter, setSelectedFilter] = useState<string>(
+    FILTER_TYPES[0] ?? 'Livestream'
+  );
   const [activeProductView, setActiveProductView] = useState<boolean>(false);
   const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
 
@@ -215,6 +223,7 @@ const ProductList = () => {
             transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
           >
             <ProductFilterSection
+              filterTypes={FILTER_TYPES}
               selectedFilter={selectedFilter}
               handleFilterType={handleFilterType}
             />

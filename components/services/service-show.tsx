@@ -12,7 +12,7 @@ const ServiceShow = () => {
 
   const services = [
     {
-      name: 'Sản xuất TVC Quảng cáo',
+      name: 'Quay Phim Sự Kiện',
       products: [
         { type: 'video' },
         { type: 'image' },

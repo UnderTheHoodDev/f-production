@@ -14,22 +14,25 @@ export const metadata: Metadata = {
     default: 'F Production',
     template: '%s | F Production',
   },
+  // Bản đầy đủ (khi bật lại các dịch vụ đang ẩn trong lib/services-data.ts):
+  // 'F.Production - Đơn vị cung cấp dịch vụ quay phim, chụp ảnh sự kiện, TVC,
+  //  phim doanh nghiệp, livestream và truyền thông chuyên nghiệp tại Việt Nam.'
   description:
-    'F.Production - Đơn vị cung cấp dịch vụ quay phim, chụp ảnh sự kiện, TVC, phim doanh nghiệp, livestream và truyền thông chuyên nghiệp tại Việt Nam.',
+    'F.Production - Đơn vị cung cấp dịch vụ quay phim sự kiện, chụp ảnh sự kiện, livestream, chụp ảnh profile và podcast chuyên nghiệp tại Việt Nam.',
   openGraph: {
     type: 'website',
     url: siteUrl,
     siteName: 'F Production',
     title: 'F Production',
     description:
-      'Đơn vị cung cấp dịch vụ quay phim, chụp ảnh sự kiện, TVC, phim doanh nghiệp, livestream và truyền thông chuyên nghiệp tại Việt Nam.',
+      'Đơn vị cung cấp dịch vụ quay phim sự kiện, chụp ảnh sự kiện, livestream, chụp ảnh profile và podcast chuyên nghiệp tại Việt Nam.',
     images: [{ url: '/f-production.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'F Production',
     description:
-      'Đơn vị cung cấp dịch vụ quay phim, chụp ảnh sự kiện, TVC, phim doanh nghiệp, livestream và truyền thông chuyên nghiệp tại Việt Nam.',
+      'Đơn vị cung cấp dịch vụ quay phim sự kiện, chụp ảnh sự kiện, livestream, chụp ảnh profile và podcast chuyên nghiệp tại Việt Nam.',
     images: ['/f-production.png'],
   },
   robots: { index: true, follow: true },

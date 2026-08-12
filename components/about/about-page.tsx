@@ -269,7 +269,7 @@ const AboutPage = () => {
                             <h3 className="text-primary mb-4 text-xl font-bold md:text-2xl">Sứ mệnh</h3>
                             <div className="flex flex-col gap-3 text-sm leading-relaxed text-foreground/80 md:text-base">
                                 <p>
-                                    F Production cam kết mang đến dịch vụ quay phim, chụp ảnh sự kiện và sản xuất phim doanh nghiệp chuyên nghiệp, sáng tạo và chất lượng cao.
+                                    F Production cam kết mang đến dịch vụ quay phim, chụp ảnh sự kiện và livestream chuyên nghiệp, sáng tạo và chất lượng cao.
                                 </p>
                                 <p>
                                     Chúng tôi giúp khách hàng lưu giữ khoảnh khắc, kể câu chuyện thương hiệu bằng hình ảnh chân thực và sống động, từ đó tạo dựng giá trị bền vững cho doanh nghiệp và cộng đồng.
